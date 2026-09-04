@@ -1,0 +1,70 @@
+# IMX219 Binocular Distance-to-Haptic System
+
+This project combines two 8 MP IMX219 CSI sensors, calibrated stereo depth,
+three DA7280 LRA channels, and informational YOLO detection on a Jetson Orin
+Nano. Runtime capture is 1280x720 at 30 FPS because calibration maps are tied
+to resolution and sensor mode.
+
+## Data flow
+
+1. Sensor 0 and sensor 1 are captured through low-latency GStreamer pipelines.
+2. Frames are paired by closest host arrival time and rectified with
+   `stereo_calibration.npz`.
+3. A latest-frame worker computes VPI CUDA disparity, confidence and metric Z
+   depth from the saved Q matrix. OpenCV StereoSGBM is the safety fallback.
+4. Valid metric depth is split into left, center, and right zones.
+   Isolated near speckles are rejected before selecting a surface distance.
+5. Only these stereo zone distances control the SC2/SC3/SC4 actuators.
+6. YOLO runs in an isolated process and is used only for display information.
+
+## Run
+
+For the first physical camera check, set `ENABLE_ACTUATORS = False` in
+`config.py`. Then run:
+
+```bash
+./run_with_sudo.sh
+```
+
+The isolated YOLO process is necessary because JetPack's GStreamer-enabled
+OpenCV uses the system NumPy 1.21 build, while the installed Ultralytics stack
+uses the newer user-site NumPy build.
+
+## Tests
+
+```bash
+cd /home/orin_nano/Desktop/FYP2/3.0_imx219
+python3 -m unittest discover -s tests -v
+```
+
+The tests verify asset hashes, calibration metadata, disparity-to-depth
+conversion, confidence rejection, robust zones, exact haptic boundaries,
+DA7280 register order, fault handling, and final mux shutdown.
+
+## Hardware mapping
+
+- I2C bus: 1
+- TCA9548A: `0x70`
+- DA7280: `0x4A`
+- Left: SC2
+- Center: SC3
+- Right: SC4
+
+DA7280 actuator voltage/current/impedance/resonant-period registers are not
+guessed or overwritten. They must match the exact installed LRA.
+
+## Applied stereo profiles
+
+- `2.1_testdepthimx219`: the exact OpenCV comparison profile, block size 11 and
+  160 disparities.
+- `3.0_imx219`: VPI CUDA with 256 disparities. Run
+  `../1.1_depth_visualization/run_easy_tuner.sh`, place the target at 1 m, and
+  press `A` to produce `vpi_tuned_profile.json` automatically.
+- The VPI profile is accepted only when its calibration SHA-256 matches the
+  calibration used by this application. If the profile is absent, documented
+  built-in VPI defaults are used. If VPI fails, the log reports the reason and
+  the application falls back to the tuned OpenCV SGBM implementation.
+
+With this calibration (`fB` about 68 px·m), 256 disparities has a theoretical
+near limit around 0.27 m. Depth configured down to 0.1 m cannot be recovered
+by this stereo matcher; invalid pixels remain black and do not drive haptics.

@@ -1,0 +1,577 @@
+{
+  "best": {
+    "processing_ms": 417.5657880259678,
+    "roi": {
+      "error_m": -0.01915132999420166,
+      "mad_m": 0.0008844733238220215,
+      "median_m": 0.9808486700057983,
+      "total_count": 3721,
+      "valid_count": 3721,
+      "valid_percentage": 100.0
+    },
+    "score": 0.13652871931512428,
+    "settings": {
+      "backend": "opencv-sgbm",
+      "block_size": 11,
+      "disp12_max_diff": 1,
+      "min_disparity": 0,
+      "num_disparities": 160,
+      "p1_factor": 8,
+      "p2_factor": 32,
+      "pre_filter_cap": 63,
+      "speckle_range": 2,
+      "speckle_window_size": 100,
+      "uniqueness_ratio": 10,
+      "use_wls": true,
+      "wls_lambda": 8000.0,
+      "wls_sigma": 1.5
+    },
+    "whole_frame_valid_percentage": 33.860568576388886
+  },
+  "calibration": {
+    "baseline_m": 0.059737592624740474,
+    "path": "/home/orin_nano/Desktop/FYP2/1.0_calibration/images/2026-08-31_16-41-19_757318/stereo_calibration.npz",
+    "resolution": [
+      1280,
+      720
+    ],
+    "sha256": "3f892706c9130a221e53f8248421498175bd13c633ad13b7b9b0e0ca9e2a4dba"
+  },
+  "capture": {
+    "host_pair_skew_ms": 12.405768036842346,
+    "sequence": 627
+  },
+  "created_at": "2026-09-03T23:33:19",
+  "known_distance_m": 1.0,
+  "method": "Measured flat-target SGBM automatic sweep",
+  "ranked_candidates": [
+    {
+      "processing_ms": 417.5657880259678,
+      "roi": {
+        "error_m": -0.01915132999420166,
+        "mad_m": 0.0008844733238220215,
+        "median_m": 0.9808486700057983,
+        "total_count": 3721,
+        "valid_count": 3721,
+        "valid_percentage": 100.0
+      },
+      "score": 0.13652871931512428,
+      "settings": {
+        "backend": "opencv-sgbm",
+        "block_size": 11,
+        "disp12_max_diff": 1,
+        "min_disparity": 0,
+        "num_disparities": 160,
+        "p1_factor": 8,
+        "p2_factor": 32,
+        "pre_filter_cap": 63,
+        "speckle_range": 2,
+        "speckle_window_size": 100,
+        "uniqueness_ratio": 10,
+        "use_wls": true,
+        "wls_lambda": 8000.0,
+        "wls_sigma": 1.5
+      },
+      "whole_frame_valid_percentage": 33.860568576388886
+    },
+    {
+      "processing_ms": 500.4184120334685,
+      "roi": {
+        "error_m": -0.01915132999420166,
+        "mad_m": 0.0008844733238220215,
+        "median_m": 0.9808486700057983,
+        "total_count": 3721,
+        "valid_count": 3721,
+        "valid_percentage": 100.0
+      },
+      "score": 0.14133943909437707,
+      "settings": {
+        "backend": "opencv-sgbm",
+        "block_size": 11,
+        "disp12_max_diff": 1,
+        "min_disparity": 0,
+        "num_disparities": 192,
+        "p1_factor": 8,
+        "p2_factor": 32,
+        "pre_filter_cap": 63,
+        "speckle_range": 2,
+        "speckle_window_size": 100,
+        "uniqueness_ratio": 10,
+        "use_wls": true,
+        "wls_lambda": 8000.0,
+        "wls_sigma": 1.5
+      },
+      "whole_frame_valid_percentage": 29.210286458333336
+    },
+    {
+      "processing_ms": 632.2975680232048,
+      "roi": {
+        "error_m": -0.01915132999420166,
+        "mad_m": 0.0008844733238220215,
+        "median_m": 0.9808486700057983,
+        "total_count": 3721,
+        "valid_count": 3721,
+        "valid_percentage": 100.0
+      },
+      "score": 0.14696470483309693,
+      "settings": {
+        "backend": "opencv-sgbm",
+        "block_size": 11,
+        "disp12_max_diff": 1,
+        "min_disparity": 0,
+        "num_disparities": 256,
+        "p1_factor": 8,
+        "p2_factor": 32,
+        "pre_filter_cap": 63,
+        "speckle_range": 2,
+        "speckle_window_size": 100,
+        "uniqueness_ratio": 10,
+        "use_wls": true,
+        "wls_lambda": 8000.0,
+        "wls_sigma": 1.5
+      },
+      "whole_frame_valid_percentage": 25.87250434027778
+    },
+    {
+      "processing_ms": 219.64186301920563,
+      "roi": {
+        "error_m": -0.01649320125579834,
+        "mad_m": 0.008804917335510254,
+        "median_m": 0.9835067987442017,
+        "total_count": 3721,
+        "valid_count": 3178,
+        "valid_percentage": 85.40714861596345
+      },
+      "score": 0.177455326138589,
+      "settings": {
+        "backend": "opencv-sgbm",
+        "block_size": 11,
+        "disp12_max_diff": 1,
+        "min_disparity": 0,
+        "num_disparities": 160,
+        "p1_factor": 8,
+        "p2_factor": 32,
+        "pre_filter_cap": 63,
+        "speckle_range": 2,
+        "speckle_window_size": 100,
+        "uniqueness_ratio": 10,
+        "use_wls": false,
+        "wls_lambda": 8000.0,
+        "wls_sigma": 1.5
+      },
+      "whole_frame_valid_percentage": 20.18532986111111
+    },
+    {
+      "processing_ms": 261.1847569933161,
+      "roi": {
+        "error_m": -0.01649320125579834,
+        "mad_m": 0.008804917335510254,
+        "median_m": 0.9835067987442017,
+        "total_count": 3721,
+        "valid_count": 3178,
+        "valid_percentage": 85.40714861596345
+      },
+      "score": 0.17966482910364567,
+      "settings": {
+        "backend": "opencv-sgbm",
+        "block_size": 11,
+        "disp12_max_diff": 1,
+        "min_disparity": 0,
+        "num_disparities": 192,
+        "p1_factor": 8,
+        "p2_factor": 32,
+        "pre_filter_cap": 63,
+        "speckle_range": 2,
+        "speckle_window_size": 100,
+        "uniqueness_ratio": 10,
+        "use_wls": false,
+        "wls_lambda": 8000.0,
+        "wls_sigma": 1.5
+      },
+      "whole_frame_valid_percentage": 18.258897569444443
+    },
+    {
+      "processing_ms": 311.367089045234,
+      "roi": {
+        "error_m": -0.01649320125579834,
+        "mad_m": 0.008804917335510254,
+        "median_m": 0.9835067987442017,
+        "total_count": 3721,
+        "valid_count": 3178,
+        "valid_percentage": 85.40714861596345
+      },
+      "score": 0.18176795531520318,
+      "settings": {
+        "backend": "opencv-sgbm",
+        "block_size": 11,
+        "disp12_max_diff": 1,
+        "min_disparity": 0,
+        "num_disparities": 256,
+        "p1_factor": 8,
+        "p2_factor": 32,
+        "pre_filter_cap": 63,
+        "speckle_range": 2,
+        "speckle_window_size": 100,
+        "uniqueness_ratio": 10,
+        "use_wls": false,
+        "wls_lambda": 8000.0,
+        "wls_sigma": 1.5
+      },
+      "whole_frame_valid_percentage": 17.063585069444446
+    },
+    {
+      "processing_ms": 221.9273040536791,
+      "roi": {
+        "error_m": -0.01649320125579834,
+        "mad_m": 0.008804917335510254,
+        "median_m": 0.9835067987442017,
+        "total_count": 3721,
+        "valid_count": 2900,
+        "valid_percentage": 77.93603869927439
+      },
+      "score": 0.19884867745302373,
+      "settings": {
+        "backend": "opencv-sgbm",
+        "block_size": 9,
+        "disp12_max_diff": 1,
+        "min_disparity": 0,
+        "num_disparities": 160,
+        "p1_factor": 8,
+        "p2_factor": 32,
+        "pre_filter_cap": 63,
+        "speckle_range": 2,
+        "speckle_window_size": 100,
+        "uniqueness_ratio": 10,
+        "use_wls": false,
+        "wls_lambda": 8000.0,
+        "wls_sigma": 1.5
+      },
+      "whole_frame_valid_percentage": 18.362413194444443
+    },
+    {
+      "processing_ms": 259.2379179550335,
+      "roi": {
+        "error_m": -0.01649320125579834,
+        "mad_m": 0.008804917335510254,
+        "median_m": 0.9835067987442017,
+        "total_count": 3721,
+        "valid_count": 2900,
+        "valid_percentage": 77.93603869927439
+      },
+      "score": 0.20096653102631437,
+      "settings": {
+        "backend": "opencv-sgbm",
+        "block_size": 9,
+        "disp12_max_diff": 1,
+        "min_disparity": 0,
+        "num_disparities": 192,
+        "p1_factor": 8,
+        "p2_factor": 32,
+        "pre_filter_cap": 63,
+        "speckle_range": 2,
+        "speckle_window_size": 100,
+        "uniqueness_ratio": 10,
+        "use_wls": false,
+        "wls_lambda": 8000.0,
+        "wls_sigma": 1.5
+      },
+      "whole_frame_valid_percentage": 16.365342881944443
+    },
+    {
+      "processing_ms": 298.00231801345944,
+      "roi": {
+        "error_m": -0.01649320125579834,
+        "mad_m": 0.008804917335510254,
+        "median_m": 0.9835067987442017,
+        "total_count": 3721,
+        "valid_count": 2900,
+        "valid_percentage": 77.93603869927439
+      },
+      "score": 0.20277285495515046,
+      "settings": {
+        "backend": "opencv-sgbm",
+        "block_size": 9,
+        "disp12_max_diff": 1,
+        "min_disparity": 0,
+        "num_disparities": 256,
+        "p1_factor": 8,
+        "p2_factor": 32,
+        "pre_filter_cap": 63,
+        "speckle_range": 2,
+        "speckle_window_size": 100,
+        "uniqueness_ratio": 10,
+        "use_wls": false,
+        "wls_lambda": 8000.0,
+        "wls_sigma": 1.5
+      },
+      "whole_frame_valid_percentage": 15.078559027777777
+    },
+    {
+      "processing_ms": 225.53824703209102,
+      "roi": {
+        "error_m": -0.01649320125579834,
+        "mad_m": 0.008804917335510254,
+        "median_m": 0.9835067987442017,
+        "total_count": 3721,
+        "valid_count": 2572,
+        "valid_percentage": 69.12120397742542
+      },
+      "score": 0.22464169002945075,
+      "settings": {
+        "backend": "opencv-sgbm",
+        "block_size": 7,
+        "disp12_max_diff": 1,
+        "min_disparity": 0,
+        "num_disparities": 160,
+        "p1_factor": 8,
+        "p2_factor": 32,
+        "pre_filter_cap": 63,
+        "speckle_range": 2,
+        "speckle_window_size": 100,
+        "uniqueness_ratio": 10,
+        "use_wls": false,
+        "wls_lambda": 8000.0,
+        "wls_sigma": 1.5
+      },
+      "whole_frame_valid_percentage": 15.88205295138889
+    },
+    {
+      "processing_ms": 252.84939794801176,
+      "roi": {
+        "error_m": -0.01649320125579834,
+        "mad_m": 0.008061587810516357,
+        "median_m": 0.9835067987442017,
+        "total_count": 3721,
+        "valid_count": 2431,
+        "valid_percentage": 65.3319000268745
+      },
+      "score": 0.2366656565308126,
+      "settings": {
+        "backend": "opencv-sgbm",
+        "block_size": 7,
+        "disp12_max_diff": 1,
+        "min_disparity": 0,
+        "num_disparities": 192,
+        "p1_factor": 8,
+        "p2_factor": 32,
+        "pre_filter_cap": 63,
+        "speckle_range": 2,
+        "speckle_window_size": 100,
+        "uniqueness_ratio": 10,
+        "use_wls": false,
+        "wls_lambda": 8000.0,
+        "wls_sigma": 1.5
+      },
+      "whole_frame_valid_percentage": 13.978624131944445
+    },
+    {
+      "processing_ms": 315.2778029907495,
+      "roi": {
+        "error_m": -0.01649320125579834,
+        "mad_m": 0.008061587810516357,
+        "median_m": 0.9835067987442017,
+        "total_count": 3721,
+        "valid_count": 2431,
+        "valid_percentage": 65.3319000268745
+      },
+      "score": 0.23911945486265027,
+      "settings": {
+        "backend": "opencv-sgbm",
+        "block_size": 7,
+        "disp12_max_diff": 1,
+        "min_disparity": 0,
+        "num_disparities": 256,
+        "p1_factor": 8,
+        "p2_factor": 32,
+        "pre_filter_cap": 63,
+        "speckle_range": 2,
+        "speckle_window_size": 100,
+        "uniqueness_ratio": 10,
+        "use_wls": false,
+        "wls_lambda": 8000.0,
+        "wls_sigma": 1.5
+      },
+      "whole_frame_valid_percentage": 12.816731770833334
+    },
+    {
+      "processing_ms": 241.07632599771023,
+      "roi": {
+        "error_m": -0.01826685667037964,
+        "mad_m": 0.007903099060058594,
+        "median_m": 0.9817331433296204,
+        "total_count": 3721,
+        "valid_count": 2145,
+        "valid_percentage": 57.64579414135985
+      },
+      "score": 0.2647033107524582,
+      "settings": {
+        "backend": "opencv-sgbm",
+        "block_size": 5,
+        "disp12_max_diff": 1,
+        "min_disparity": 0,
+        "num_disparities": 160,
+        "p1_factor": 8,
+        "p2_factor": 32,
+        "pre_filter_cap": 63,
+        "speckle_range": 2,
+        "speckle_window_size": 100,
+        "uniqueness_ratio": 10,
+        "use_wls": false,
+        "wls_lambda": 8000.0,
+        "wls_sigma": 1.5
+      },
+      "whole_frame_valid_percentage": 13.02734375
+    },
+    {
+      "processing_ms": 263.71678593568504,
+      "roi": {
+        "error_m": -0.01826685667037964,
+        "mad_m": 0.007903099060058594,
+        "median_m": 0.9817331433296204,
+        "total_count": 3721,
+        "valid_count": 2145,
+        "valid_percentage": 57.64579414135985
+      },
+      "score": 0.2661632862693475,
+      "settings": {
+        "backend": "opencv-sgbm",
+        "block_size": 5,
+        "disp12_max_diff": 1,
+        "min_disparity": 0,
+        "num_disparities": 192,
+        "p1_factor": 8,
+        "p2_factor": 32,
+        "pre_filter_cap": 63,
+        "speckle_range": 2,
+        "speckle_window_size": 100,
+        "uniqueness_ratio": 10,
+        "use_wls": false,
+        "wls_lambda": 8000.0,
+        "wls_sigma": 1.5
+      },
+      "whole_frame_valid_percentage": 11.4658203125
+    },
+    {
+      "processing_ms": 338.45532790292054,
+      "roi": {
+        "error_m": -0.01826685667037964,
+        "mad_m": 0.007903099060058594,
+        "median_m": 0.9817331433296204,
+        "total_count": 3721,
+        "valid_count": 2145,
+        "valid_percentage": 57.64579414135985
+      },
+      "score": 0.26897450719850335,
+      "settings": {
+        "backend": "opencv-sgbm",
+        "block_size": 5,
+        "disp12_max_diff": 1,
+        "min_disparity": 0,
+        "num_disparities": 256,
+        "p1_factor": 8,
+        "p2_factor": 32,
+        "pre_filter_cap": 63,
+        "speckle_range": 2,
+        "speckle_window_size": 100,
+        "uniqueness_ratio": 10,
+        "use_wls": false,
+        "wls_lambda": 8000.0,
+        "wls_sigma": 1.5
+      },
+      "whole_frame_valid_percentage": 10.327690972222223
+    },
+    {
+      "processing_ms": 208.4973749006167,
+      "roi": {
+        "error_m": -0.017380893230438232,
+        "mad_m": 0.007146358489990234,
+        "median_m": 0.9826191067695618,
+        "total_count": 3721,
+        "valid_count": 1844,
+        "valid_percentage": 49.55657081429723
+      },
+      "score": 0.2825351879504484,
+      "settings": {
+        "backend": "opencv-sgbm",
+        "block_size": 3,
+        "disp12_max_diff": 1,
+        "min_disparity": 0,
+        "num_disparities": 160,
+        "p1_factor": 8,
+        "p2_factor": 32,
+        "pre_filter_cap": 63,
+        "speckle_range": 2,
+        "speckle_window_size": 100,
+        "uniqueness_ratio": 10,
+        "use_wls": false,
+        "wls_lambda": 8000.0,
+        "wls_sigma": 1.5
+      },
+      "whole_frame_valid_percentage": 10.586263020833334
+    },
+    {
+      "processing_ms": 251.00257503800094,
+      "roi": {
+        "error_m": -0.017380893230438232,
+        "mad_m": 0.007146358489990234,
+        "median_m": 0.9826191067695618,
+        "total_count": 3721,
+        "valid_count": 1844,
+        "valid_percentage": 49.55657081429723
+      },
+      "score": 0.2845245366629033,
+      "settings": {
+        "backend": "opencv-sgbm",
+        "block_size": 3,
+        "disp12_max_diff": 1,
+        "min_disparity": 0,
+        "num_disparities": 192,
+        "p1_factor": 8,
+        "p2_factor": 32,
+        "pre_filter_cap": 63,
+        "speckle_range": 2,
+        "speckle_window_size": 100,
+        "uniqueness_ratio": 10,
+        "use_wls": false,
+        "wls_lambda": 8000.0,
+        "wls_sigma": 1.5
+      },
+      "whole_frame_valid_percentage": 9.157877604166668
+    },
+    {
+      "processing_ms": 314.5593000808731,
+      "roi": {
+        "error_m": -0.017380893230438232,
+        "mad_m": 0.007146358489990234,
+        "median_m": 0.9826191067695618,
+        "total_count": 3721,
+        "valid_count": 1844,
+        "valid_percentage": 49.55657081429723
+      },
+      "score": 0.28690367765030056,
+      "settings": {
+        "backend": "opencv-sgbm",
+        "block_size": 3,
+        "disp12_max_diff": 1,
+        "min_disparity": 0,
+        "num_disparities": 256,
+        "p1_factor": 8,
+        "p2_factor": 32,
+        "pre_filter_cap": 63,
+        "speckle_range": 2,
+        "speckle_window_size": 100,
+        "uniqueness_ratio": 10,
+        "use_wls": false,
+        "wls_lambda": 8000.0,
+        "wls_sigma": 1.5
+      },
+      "whole_frame_valid_percentage": 8.212999131944445
+    }
+  ],
+  "roi_center": [
+    640,
+    360
+  ],
+  "roi_size_px": 61,
+  "warning": "Recommendation is valid only after live checks at all navigation distances."
+}
