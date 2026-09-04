@@ -3,13 +3,17 @@
 
 The program captures 1280x720 frames from both CSI sensors, rectifies them
 with the copied calibration NPZ, computes full-resolution disparity with the
-automatically tuned OpenCV SGBM profile, calculates Z-only depth from the
-saved Q matrix, and reports
-the median distance in a centre region.
+automatically tuned OpenCV SGBM profile, calculates metric Z depth from the
+saved Q matrix, and reports the median distance in a centre region. Full XYZ
+reconstruction is available as an optional diagnostic and PLY export; it uses
+the same disparity and does not replace or improve the stereo matcher.
 
 Controls:
     Q or Esc  quit
     D         toggle the disparity debug window
+    P         toggle built-in top/front 3D projections
+    O         open the latest cloud in Open3D, when installed
+    S         save current depth, projections, arrays, and PLY evidence
 """
 
 from __future__ import annotations
@@ -20,6 +24,7 @@ import threading
 import time
 from collections import deque
 from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Optional
 
@@ -34,6 +39,14 @@ if SYSTEM_DIST_PACKAGES.is_dir():
 
 import cv2
 import numpy as np
+
+from pointcloud_utils import (
+    disparity_to_xyz,
+    make_orthographic_view,
+    sample_point_cloud,
+    save_binary_ply,
+    show_open3d_snapshot,
+)
 
 
 # ---------------------------------------------------------------------------
@@ -84,6 +97,10 @@ MAX_CONSECUTIVE_CAPTURE_FAILURES = 10
 DISPLAY_PANEL_WIDTH = 640
 DISPLAY_PANEL_HEIGHT = 360
 SHOW_DISPARITY_AT_START = False
+SHOW_POINT_CLOUD_AT_START = False
+POINT_CLOUD_STRIDE = 4
+POINT_CLOUD_WINDOW = "IMX219 3D diagnostic: top and front"
+RESULTS_3D_DIR = SCRIPT_DIR / "results_3d"
 
 
 @dataclass(frozen=True)
@@ -139,6 +156,9 @@ class DepthInput:
 class DepthResult:
     sequence: int
     disparity: np.ndarray
+    depth_map: np.ndarray
+    valid_depth_mask: np.ndarray
+    left_rectified: np.ndarray
     depth_view: np.ndarray
     distance_m: Optional[float]
     box: tuple[int, int, int, int]
@@ -1050,6 +1070,42 @@ def make_disparity_view(
     return colour
 
 
+def point_cloud_from_depth_result(result: DepthResult, q_matrix: np.ndarray):
+    xyz, xyz_valid = disparity_to_xyz(
+        result.disparity,
+        q_matrix,
+        result.valid_depth_mask,
+    )
+    return sample_point_cloud(
+        xyz,
+        result.left_rectified,
+        xyz_valid,
+        stride=POINT_CLOUD_STRIDE,
+    )
+
+
+def save_3d_evidence(result: DepthResult, cloud: Any) -> Path:
+    stamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S_%f")
+    output = RESULTS_3D_DIR / stamp
+    output.mkdir(parents=True, exist_ok=False)
+    cv2.imwrite(str(output / "left_rectified.png"), result.left_rectified)
+    cv2.imwrite(str(output / "depth_heatmap.png"), result.depth_view)
+    cv2.imwrite(
+        str(output / "orthographic_3d.png"), make_orthographic_view(cloud)
+    )
+    np.save(
+        output / "disparity_float32.npy",
+        result.disparity.astype(np.float32),
+    )
+    np.save(
+        output / "depth_metres_float32.npy",
+        result.depth_map.astype(np.float32),
+    )
+    np.save(output / "valid_mask.npy", result.valid_depth_mask.astype(np.uint8))
+    save_binary_ply(output / "point_cloud.ply", cloud)
+    return output
+
+
 class AsyncDepthProcessor:
     """Continuously process only the newest submitted stereo pair.
 
@@ -1222,6 +1278,9 @@ class AsyncDepthProcessor:
                 result = DepthResult(
                     sequence=depth_input.sequence,
                     disparity=disparity,
+                    depth_map=depth_map,
+                    valid_depth_mask=valid_depth_mask,
+                    left_rectified=depth_input.left_rectified,
                     depth_view=depth_view,
                     distance_m=distance_m,
                     box=box,
@@ -1412,12 +1471,14 @@ def print_startup(
     print(f"  Maximum disparity:    {maximum_disparity}")
     if backend_name == OpenCvStereoEngine.name:
         print(f"  Tuned SGBM block:     {sgbm_block_size}")
-    print("  3D output:            Z depth only")
+    print("  Primary measurement:  Z depth")
+    print("  Optional 3D:          calibrated XYZ projection and PLY")
     print("  Rectification maps:   fixed-point CV_16SC2")
     print("  Pair skew policy:     measured only, never rejected")
     print("  Sync timestamps:      host arrival time (software pairing)")
     print("  Depth schedule:       continuous async, newest frame")
-    print("  Controls:             Q/Esc quit | D disparity\n")
+    print("  Controls:             Q/Esc quit | D disparity | P 3D")
+    print("                        O Open3D | S save 3D evidence\n")
 
 
 def run(args: argparse.Namespace) -> None:
@@ -1497,10 +1558,14 @@ def run(args: argparse.Namespace) -> None:
         )
 
         show_disparity = SHOW_DISPARITY_AT_START
+        show_point_cloud = SHOW_POINT_CLOUD_AT_START
         display_fps = 0.0
         previous_display_time = time.perf_counter()
 
         latest_disparity: Optional[np.ndarray] = None
+        latest_depth_result: Optional[DepthResult] = None
+        latest_cloud: Optional[Any] = None
+        cloud_sequence = -1
         latest_depth_view = np.zeros(
             (calibration.height, calibration.width, 3),
             dtype=np.uint8,
@@ -1537,6 +1602,7 @@ def run(args: argparse.Namespace) -> None:
                 and depth_result.sequence > last_depth_sequence
             ):
                 last_depth_sequence = depth_result.sequence
+                latest_depth_result = depth_result
                 latest_disparity = depth_result.disparity
                 latest_depth_view = depth_result.depth_view
                 latest_distance_m = depth_result.distance_m
@@ -1606,13 +1672,68 @@ def run(args: argparse.Namespace) -> None:
                     ),
                 )
 
+            if show_point_cloud and latest_depth_result is not None:
+                if cloud_sequence != latest_depth_result.sequence:
+                    latest_cloud = point_cloud_from_depth_result(
+                        latest_depth_result,
+                        calibration.q_matrix,
+                    )
+                    cloud_sequence = latest_depth_result.sequence
+                cv2.imshow(
+                    POINT_CLOUD_WINDOW,
+                    make_orthographic_view(latest_cloud),
+                )
+
             key = cv2.waitKey(1) & 0xFF
             if key in (ord("q"), ord("Q"), 27):
                 break
             if key in (ord("d"), ord("D")):
                 show_disparity = not show_disparity
                 if not show_disparity:
-                    cv2.destroyWindow("Disparity Debug")
+                    try:
+                        cv2.destroyWindow("Disparity Debug")
+                    except cv2.error:
+                        pass
+            if key in (ord("p"), ord("P")):
+                show_point_cloud = not show_point_cloud
+                if not show_point_cloud:
+                    try:
+                        cv2.destroyWindow(POINT_CLOUD_WINDOW)
+                    except cv2.error:
+                        pass
+                print(
+                    "3D projections "
+                    f"{'enabled' if show_point_cloud else 'disabled'}."
+                )
+            if key in (ord("o"), ord("O")):
+                if latest_depth_result is None:
+                    print("No depth result is available for Open3D yet.")
+                else:
+                    try:
+                        if cloud_sequence != latest_depth_result.sequence:
+                            latest_cloud = point_cloud_from_depth_result(
+                                latest_depth_result,
+                                calibration.q_matrix,
+                            )
+                            cloud_sequence = latest_depth_result.sequence
+                        show_open3d_snapshot(latest_cloud)
+                    except RuntimeError as exc:
+                        print(f"Open3D unavailable: {exc}")
+            if key in (ord("s"), ord("S")):
+                if latest_depth_result is None:
+                    print("No depth result is available to save yet.")
+                else:
+                    if cloud_sequence != latest_depth_result.sequence:
+                        latest_cloud = point_cloud_from_depth_result(
+                            latest_depth_result,
+                            calibration.q_matrix,
+                        )
+                        cloud_sequence = latest_depth_result.sequence
+                    output = save_3d_evidence(
+                        latest_depth_result,
+                        latest_cloud,
+                    )
+                    print(f"Saved 3D evidence: {output}")
     finally:
         if capture_worker is not None:
             capture_worker.stop()

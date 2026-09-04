@@ -25,11 +25,9 @@ cd /home/orin_nano/Desktop/FYP2/1.1_depth_visualization
    validated profile to `../3.0_imx219/vpi_tuned_profile.json`.
 7. Press `Q` to finish.
 
-The Easy Mode launcher reads the original calibration directly from:
-
-```text
-../1.0_calibration/images/2026-08-31_16-41-19_757318/stereo_calibration.npz
-```
+The Easy Mode launcher automatically selects the newest completed calibration
+under `../1.0_calibration/images/*/stereo_calibration.npz` and prints the exact
+path before opening the cameras.
 
 The selected profile is loaded automatically by the `3.0` application, but it
 must still be checked at 0.5, 1.5, 2.0 and 3.0 metres before enabling actuators.
@@ -66,12 +64,29 @@ To inspect an already captured pair without opening either camera:
 - `B`: switch between SGBM and VPI CUDA.
 - Click the metric-depth pane to move the measurement ROI.
 - `R`: return the ROI to the center.
+- `P`: toggle dependency-free top/front 3D projections made from the current
+  calibrated disparity and `Q` matrix.
+- `O`: open a snapshot in Open3D when the optional `open3d` package is
+  installed. If it is absent, the tuner continues normally and explains that
+  the built-in view or saved PLY can be used instead.
 - `S`: save the rectified pair, heatmaps, float disparity/depth arrays, valid
-  mask, settings, timing and ROI metrics under `results/`.
+  mask, settings, timing, ROI metrics and `point_cloud.ply` under `results/`.
 - `Q` or `Esc`: close the tuner.
 
 The controls window contains separate SGBM and VPI settings. Settings that
 belong to the inactive backend have no effect.
+
+## What the 3D view means
+
+The point cloud is reconstructed from the same stereo disparity using the
+calibration `Q` matrix. It is useful for seeing geometry, holes and obvious
+outliers, but it does not make an inaccurate disparity map more accurate.
+Calibration, rectification, synchronized capture and stereo matching remain
+the sources of depth quality.
+
+Each normal `S` save and each successful automatic tune includes a binary PLY
+file. That file can be opened later in Open3D, CloudCompare or MeshLab, even
+on another computer.
 
 ## Important VPI limitation
 

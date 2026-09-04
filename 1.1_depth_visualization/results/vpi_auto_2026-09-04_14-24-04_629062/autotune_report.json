@@ -1,0 +1,3171 @@
+{
+  "best": {
+    "processing_ms": 85.78410802874714,
+    "roi": {
+      "error_m": -0.03934049606323242,
+      "mad_m": 0.006219208240509033,
+      "median_m": 0.9606595039367676,
+      "total_count": 3721,
+      "valid_count": 3721,
+      "valid_percentage": 100.0
+    },
+    "score": 0.19185183070525008,
+    "settings": {
+      "backend": "vpi-cuda",
+      "confidence_threshold": 1,
+      "include_diagonals": false,
+      "max_disparity": 256,
+      "min_disparity": 0,
+      "p1": 8,
+      "p2": 96,
+      "uniqueness": -1.0,
+      "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+    },
+    "whole_frame_valid_percentage": 54.824978298611114
+  },
+  "calibration": {
+    "baseline_m": 0.060291021567817425,
+    "path": "/home/orin_nano/Desktop/FYP2/1.0_calibration/images/2026-09-04_14-09-56_446423_recalibrated/stereo_calibration.npz",
+    "resolution": [
+      1280,
+      720
+    ],
+    "sha256": "8198efd156491578afda3b11a9f2fe9c44d150663e6347676830a14dde4cff2e"
+  },
+  "capture": {
+    "host_pair_skew_ms": 8.371458039619029,
+    "sequence": 527
+  },
+  "created_at": "2026-09-04T14:24:05",
+  "known_distance_m": 1.0,
+  "method": "Measured flat-target VPI CUDA native-parameter sweep",
+  "ranked_candidates": [
+    {
+      "processing_ms": 85.78410802874714,
+      "roi": {
+        "error_m": -0.03934049606323242,
+        "mad_m": 0.006219208240509033,
+        "median_m": 0.9606595039367676,
+        "total_count": 3721,
+        "valid_count": 3721,
+        "valid_percentage": 100.0
+      },
+      "score": 0.19185183070525008,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 1,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 8,
+        "p2": 96,
+        "uniqueness": -1.0,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 54.824978298611114
+    },
+    {
+      "processing_ms": 85.78410802874714,
+      "roi": {
+        "error_m": -0.03934049606323242,
+        "mad_m": 0.006219208240509033,
+        "median_m": 0.9606595039367676,
+        "total_count": 3721,
+        "valid_count": 3721,
+        "valid_percentage": 100.0
+      },
+      "score": 0.191973141469139,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 4096,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 8,
+        "p2": 96,
+        "uniqueness": -1.0,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 54.58235677083333
+    },
+    {
+      "processing_ms": 85.78410802874714,
+      "roi": {
+        "error_m": -0.03934049606323242,
+        "mad_m": 0.006219208240509033,
+        "median_m": 0.9606595039367676,
+        "total_count": 3721,
+        "valid_count": 3721,
+        "valid_percentage": 100.0
+      },
+      "score": 0.19210996872608344,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 8192,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 8,
+        "p2": 96,
+        "uniqueness": -1.0,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 54.30870225694444
+    },
+    {
+      "processing_ms": 85.78410802874714,
+      "roi": {
+        "error_m": -0.03934049606323242,
+        "mad_m": 0.006219208240509033,
+        "median_m": 0.9606595039367676,
+        "total_count": 3721,
+        "valid_count": 3721,
+        "valid_percentage": 100.0
+      },
+      "score": 0.19234266186844454,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 16384,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 8,
+        "p2": 96,
+        "uniqueness": -1.0,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 53.84331597222223
+    },
+    {
+      "processing_ms": 85.78410802874714,
+      "roi": {
+        "error_m": -0.03934049606323242,
+        "mad_m": 0.006219208240509033,
+        "median_m": 0.9606595039367676,
+        "total_count": 3721,
+        "valid_count": 3721,
+        "valid_percentage": 100.0
+      },
+      "score": 0.1931565182052501,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 32767,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 8,
+        "p2": 96,
+        "uniqueness": -1.0,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 52.215603298611114
+    },
+    {
+      "processing_ms": 83.38387007825077,
+      "roi": {
+        "error_m": -0.03975224494934082,
+        "mad_m": 0.006213843822479248,
+        "median_m": 0.9602477550506592,
+        "total_count": 3721,
+        "valid_count": 3721,
+        "valid_percentage": 100.0
+      },
+      "score": 0.19869617048759636,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 1,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 8,
+        "p2": 96,
+        "uniqueness": 0.95,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 44.270182291666664
+    },
+    {
+      "processing_ms": 83.38387007825077,
+      "roi": {
+        "error_m": -0.03975224494934082,
+        "mad_m": 0.006213843822479248,
+        "median_m": 0.9602477550506592,
+        "total_count": 3721,
+        "valid_count": 3721,
+        "valid_percentage": 100.0
+      },
+      "score": 0.19881059106051302,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 4096,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 8,
+        "p2": 96,
+        "uniqueness": 0.95,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 44.041341145833336
+    },
+    {
+      "processing_ms": 96.93415008950979,
+      "roi": {
+        "error_m": -0.04057478904724121,
+        "mad_m": 0.008955121040344238,
+        "median_m": 0.9594252109527588,
+        "total_count": 3721,
+        "valid_count": 3721,
+        "valid_percentage": 100.0
+      },
+      "score": 0.19890933924869428,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 1,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 5,
+        "p2": 64,
+        "uniqueness": -1.0,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 59.46104600694444
+    },
+    {
+      "processing_ms": 83.38387007825077,
+      "roi": {
+        "error_m": -0.03975224494934082,
+        "mad_m": 0.006213843822479248,
+        "median_m": 0.9602477550506592,
+        "total_count": 3721,
+        "valid_count": 3721,
+        "valid_percentage": 100.0
+      },
+      "score": 0.19892891788342967,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 8192,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 8,
+        "p2": 96,
+        "uniqueness": 0.95,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 43.8046875
+    },
+    {
+      "processing_ms": 96.93415008950979,
+      "roi": {
+        "error_m": -0.04057478904724121,
+        "mad_m": 0.008955121040344238,
+        "median_m": 0.9594252109527588,
+        "total_count": 3721,
+        "valid_count": 3721,
+        "valid_percentage": 100.0
+      },
+      "score": 0.19904388785980537,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 4096,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 5,
+        "p2": 64,
+        "uniqueness": -1.0,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 59.19194878472223
+    },
+    {
+      "processing_ms": 83.38387007825077,
+      "roi": {
+        "error_m": -0.03975224494934082,
+        "mad_m": 0.006213843822479248,
+        "median_m": 0.9602477550506592,
+        "total_count": 3721,
+        "valid_count": 3721,
+        "valid_percentage": 100.0
+      },
+      "score": 0.19911701467162413,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 16384,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 8,
+        "p2": 96,
+        "uniqueness": 0.95,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 43.428493923611114
+    },
+    {
+      "processing_ms": 96.93415008950979,
+      "roi": {
+        "error_m": -0.04057478904724121,
+        "mad_m": 0.008955121040344238,
+        "median_m": 0.9594252109527588,
+        "total_count": 3721,
+        "valid_count": 3721,
+        "valid_percentage": 100.0
+      },
+      "score": 0.1992111513146665,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 8192,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 5,
+        "p2": 64,
+        "uniqueness": -1.0,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 58.85742187500001
+    },
+    {
+      "processing_ms": 96.93415008950979,
+      "roi": {
+        "error_m": -0.04057478904724121,
+        "mad_m": 0.008955121040344238,
+        "median_m": 0.9594252109527588,
+        "total_count": 3721,
+        "valid_count": 3721,
+        "valid_percentage": 100.0
+      },
+      "score": 0.19954518994313872,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 16384,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 5,
+        "p2": 64,
+        "uniqueness": -1.0,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 58.18934461805556
+    },
+    {
+      "processing_ms": 83.38387007825077,
+      "roi": {
+        "error_m": -0.03975224494934082,
+        "mad_m": 0.006213843822479248,
+        "median_m": 0.9602477550506592,
+        "total_count": 3721,
+        "valid_count": 3721,
+        "valid_percentage": 100.0
+      },
+      "score": 0.19985355981051303,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 32767,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 8,
+        "p2": 96,
+        "uniqueness": 0.95,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 41.955403645833336
+    },
+    {
+      "processing_ms": 91.22869302518666,
+      "roi": {
+        "error_m": -0.04016375541687012,
+        "mad_m": 0.01418071985244751,
+        "median_m": 0.9598362445831299,
+        "total_count": 3721,
+        "valid_count": 3721,
+        "valid_percentage": 100.0
+      },
+      "score": 0.20064858506676844,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 1,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 1,
+        "p2": 32,
+        "uniqueness": -1.0,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 68.02875434027777
+    },
+    {
+      "processing_ms": 96.93415008950979,
+      "roi": {
+        "error_m": -0.04057478904724121,
+        "mad_m": 0.008955121040344238,
+        "median_m": 0.9594252109527588,
+        "total_count": 3721,
+        "valid_count": 3721,
+        "valid_percentage": 100.0
+      },
+      "score": 0.20073730148827762,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 32767,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 5,
+        "p2": 64,
+        "uniqueness": -1.0,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 55.80512152777778
+    },
+    {
+      "processing_ms": 91.22869302518666,
+      "roi": {
+        "error_m": -0.04016375541687012,
+        "mad_m": 0.01418071985244751,
+        "median_m": 0.9598362445831299,
+        "total_count": 3721,
+        "valid_count": 3721,
+        "valid_percentage": 100.0
+      },
+      "score": 0.2007487912299629,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 4096,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 1,
+        "p2": 32,
+        "uniqueness": -1.0,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 67.82834201388889
+    },
+    {
+      "processing_ms": 91.22869302518666,
+      "roi": {
+        "error_m": -0.04016375541687012,
+        "mad_m": 0.01418071985244751,
+        "median_m": 0.9598362445831299,
+        "total_count": 3721,
+        "valid_count": 3721,
+        "valid_percentage": 100.0
+      },
+      "score": 0.20093059461537957,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 8192,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 1,
+        "p2": 32,
+        "uniqueness": -1.0,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 67.46473524305556
+    },
+    {
+      "processing_ms": 91.22869302518666,
+      "roi": {
+        "error_m": -0.04016375541687012,
+        "mad_m": 0.01418071985244751,
+        "median_m": 0.9598362445831299,
+        "total_count": 3721,
+        "valid_count": 3721,
+        "valid_percentage": 100.0
+      },
+      "score": 0.201453164059824,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 16384,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 1,
+        "p2": 32,
+        "uniqueness": -1.0,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 66.41959635416667
+    },
+    {
+      "processing_ms": 98.4147529816255,
+      "roi": {
+        "error_m": -0.04098552465438843,
+        "mad_m": 0.01079416275024414,
+        "median_m": 0.9590144753456116,
+        "total_count": 3721,
+        "valid_count": 3721,
+        "valid_percentage": 100.0
+      },
+      "score": 0.20152974149556313,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 1,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 3,
+        "p2": 48,
+        "uniqueness": -1.0,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 63.11208767361111
+    },
+    {
+      "processing_ms": 98.4147529816255,
+      "roi": {
+        "error_m": -0.04098552465438843,
+        "mad_m": 0.01079416275024414,
+        "median_m": 0.9590144753456116,
+        "total_count": 3721,
+        "valid_count": 3721,
+        "valid_percentage": 100.0
+      },
+      "score": 0.2016632050372298,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 4096,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 3,
+        "p2": 48,
+        "uniqueness": -1.0,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 62.845160590277786
+    },
+    {
+      "processing_ms": 98.4147529816255,
+      "roi": {
+        "error_m": -0.04098552465438843,
+        "mad_m": 0.01079416275024414,
+        "median_m": 0.9590144753456116,
+        "total_count": 3721,
+        "valid_count": 3721,
+        "valid_percentage": 100.0
+      },
+      "score": 0.2018546112872298,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 8192,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 3,
+        "p2": 48,
+        "uniqueness": -1.0,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 62.46234809027777
+    },
+    {
+      "processing_ms": 98.4147529816255,
+      "roi": {
+        "error_m": -0.04098552465438843,
+        "mad_m": 0.01079416275024414,
+        "median_m": 0.9590144753456116,
+        "total_count": 3721,
+        "valid_count": 3721,
+        "valid_percentage": 100.0
+      },
+      "score": 0.2022823456622298,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 16384,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 3,
+        "p2": 48,
+        "uniqueness": -1.0,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 61.60687934027778
+    },
+    {
+      "processing_ms": 91.22869302518666,
+      "roi": {
+        "error_m": -0.04016375541687012,
+        "mad_m": 0.01418071985244751,
+        "median_m": 0.9598362445831299,
+        "total_count": 3721,
+        "valid_count": 3721,
+        "valid_percentage": 100.0
+      },
+      "score": 0.20304387586537956,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 32767,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 1,
+        "p2": 32,
+        "uniqueness": -1.0,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 63.23817274305556
+    },
+    {
+      "processing_ms": 98.4147529816255,
+      "roi": {
+        "error_m": -0.04098552465438843,
+        "mad_m": 0.01079416275024414,
+        "median_m": 0.9590144753456116,
+        "total_count": 3721,
+        "valid_count": 3721,
+        "valid_percentage": 100.0
+      },
+      "score": 0.20371604791917425,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 32767,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 3,
+        "p2": 48,
+        "uniqueness": -1.0,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 58.73947482638889
+    },
+    {
+      "processing_ms": 96.01554099936038,
+      "roi": {
+        "error_m": -0.04098552465438843,
+        "mad_m": 0.009117722511291504,
+        "median_m": 0.9590144753456116,
+        "total_count": 3721,
+        "valid_count": 3716,
+        "valid_percentage": 99.86562751948401
+      },
+      "score": 0.20696433202824197,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 1,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 5,
+        "p2": 64,
+        "uniqueness": 0.95,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 47.87586805555556
+    },
+    {
+      "processing_ms": 96.01554099936038,
+      "roi": {
+        "error_m": -0.04098552465438843,
+        "mad_m": 0.009117722511291504,
+        "median_m": 0.9590144753456116,
+        "total_count": 3721,
+        "valid_count": 3716,
+        "valid_percentage": 99.86562751948401
+      },
+      "score": 0.20708271310463086,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 4096,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 5,
+        "p2": 64,
+        "uniqueness": 0.95,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 47.63910590277778
+    },
+    {
+      "processing_ms": 96.01554099936038,
+      "roi": {
+        "error_m": -0.04098552465438843,
+        "mad_m": 0.009117722511291504,
+        "median_m": 0.9590144753456116,
+        "total_count": 3721,
+        "valid_count": 3716,
+        "valid_percentage": 99.86562751948401
+      },
+      "score": 0.2072290889726864,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 8192,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 5,
+        "p2": 64,
+        "uniqueness": 0.95,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 47.346354166666664
+    },
+    {
+      "processing_ms": 96.01554099936038,
+      "roi": {
+        "error_m": -0.04098552465438843,
+        "mad_m": 0.009117722511291504,
+        "median_m": 0.9590144753456116,
+        "total_count": 3721,
+        "valid_count": 3716,
+        "valid_percentage": 99.86562751948401
+      },
+      "score": 0.20753144357338085,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 16384,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 5,
+        "p2": 64,
+        "uniqueness": 0.95,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 46.74164496527778
+    },
+    {
+      "processing_ms": 96.01554099936038,
+      "roi": {
+        "error_m": -0.04098552465438843,
+        "mad_m": 0.009117722511291504,
+        "median_m": 0.9590144753456116,
+        "total_count": 3721,
+        "valid_count": 3716,
+        "valid_percentage": 99.86562751948401
+      },
+      "score": 0.20862204687199198,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 32767,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 5,
+        "p2": 64,
+        "uniqueness": 0.95,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 44.56043836805556
+    },
+    {
+      "processing_ms": 83.09074304997921,
+      "roi": {
+        "error_m": -0.04221552610397339,
+        "mad_m": 0.010929882526397705,
+        "median_m": 0.9577844738960266,
+        "total_count": 3721,
+        "valid_count": 3712,
+        "valid_percentage": 99.75812953507122
+      },
+      "score": 0.2130825210063592,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 1,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 3,
+        "p2": 48,
+        "uniqueness": 0.95,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 50.78548177083333
+    },
+    {
+      "processing_ms": 83.09074304997921,
+      "roi": {
+        "error_m": -0.04221552610397339,
+        "mad_m": 0.010929882526397705,
+        "median_m": 0.9577844738960266,
+        "total_count": 3721,
+        "valid_count": 3712,
+        "valid_percentage": 99.75812953507122
+      },
+      "score": 0.21318506006885918,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 4096,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 3,
+        "p2": 48,
+        "uniqueness": 0.95,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 50.580403645833336
+    },
+    {
+      "processing_ms": 83.09074304997921,
+      "roi": {
+        "error_m": -0.04221552610397339,
+        "mad_m": 0.010929882526397705,
+        "median_m": 0.9577844738960266,
+        "total_count": 3721,
+        "valid_count": 3712,
+        "valid_percentage": 99.75812953507122
+      },
+      "score": 0.21335226927024808,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 8192,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 3,
+        "p2": 48,
+        "uniqueness": 0.95,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 50.24598524305556
+    },
+    {
+      "processing_ms": 97.30657399632037,
+      "roi": {
+        "error_m": -0.04016375541687012,
+        "mad_m": 0.006208598613739014,
+        "median_m": 0.9598362445831299,
+        "total_count": 3721,
+        "valid_count": 3691,
+        "valid_percentage": 99.19376511690406
+      },
+      "score": 0.21354898551976642,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 1,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 8,
+        "p2": 96,
+        "uniqueness": 0.9,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 23.513671875
+    },
+    {
+      "processing_ms": 97.30657399632037,
+      "roi": {
+        "error_m": -0.04016375541687012,
+        "mad_m": 0.006208598613739014,
+        "median_m": 0.9598362445831299,
+        "total_count": 3721,
+        "valid_count": 3691,
+        "valid_percentage": 99.19376511690406
+      },
+      "score": 0.21358663742948863,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 4096,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 8,
+        "p2": 96,
+        "uniqueness": 0.9,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 23.438368055555557
+    },
+    {
+      "processing_ms": 97.30657399632037,
+      "roi": {
+        "error_m": -0.04016375541687012,
+        "mad_m": 0.006208598613739014,
+        "median_m": 0.9598362445831299,
+        "total_count": 3721,
+        "valid_count": 3691,
+        "valid_percentage": 99.19376511690406
+      },
+      "score": 0.21364018560657197,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 8192,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 8,
+        "p2": 96,
+        "uniqueness": 0.9,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 23.33127170138889
+    },
+    {
+      "processing_ms": 97.30657399632037,
+      "roi": {
+        "error_m": -0.04016375541687012,
+        "mad_m": 0.006208598613739014,
+        "median_m": 0.9598362445831299,
+        "total_count": 3721,
+        "valid_count": 3691,
+        "valid_percentage": 99.19376511690406
+      },
+      "score": 0.21370035270726642,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 16384,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 8,
+        "p2": 96,
+        "uniqueness": 0.9,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 23.2109375
+    },
+    {
+      "processing_ms": 83.09074304997921,
+      "roi": {
+        "error_m": -0.04221552610397339,
+        "mad_m": 0.010929882526397705,
+        "median_m": 0.9577844738960266,
+        "total_count": 3721,
+        "valid_count": 3712,
+        "valid_percentage": 99.75812953507122
+      },
+      "score": 0.21374815685705364,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 16384,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 3,
+        "p2": 48,
+        "uniqueness": 0.95,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 49.45421006944444
+    },
+    {
+      "processing_ms": 97.30657399632037,
+      "roi": {
+        "error_m": -0.04016375541687012,
+        "mad_m": 0.006208598613739014,
+        "median_m": 0.9598362445831299,
+        "total_count": 3721,
+        "valid_count": 3691,
+        "valid_percentage": 99.19376511690406
+      },
+      "score": 0.21387477762046087,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 32767,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 8,
+        "p2": 96,
+        "uniqueness": 0.9,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 22.86208767361111
+    },
+    {
+      "processing_ms": 83.09074304997921,
+      "roi": {
+        "error_m": -0.04221552610397339,
+        "mad_m": 0.010929882526397705,
+        "median_m": 0.9577844738960266,
+        "total_count": 3721,
+        "valid_count": 3712,
+        "valid_percentage": 99.75812953507122
+      },
+      "score": 0.21511230616260918,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 32767,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 3,
+        "p2": 48,
+        "uniqueness": 0.95,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 46.725911458333336
+    },
+    {
+      "processing_ms": 98.29807898495346,
+      "roi": {
+        "error_m": -0.042624831199645996,
+        "mad_m": 0.01495903730392456,
+        "median_m": 0.957375168800354,
+        "total_count": 3721,
+        "valid_count": 3699,
+        "valid_percentage": 99.40876108572964
+      },
+      "score": 0.22007595870363608,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 1,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 1,
+        "p2": 32,
+        "uniqueness": 0.95,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 55.169162326388886
+    },
+    {
+      "processing_ms": 98.29807898495346,
+      "roi": {
+        "error_m": -0.042624831199645996,
+        "mad_m": 0.01495903730392456,
+        "median_m": 0.957375168800354,
+        "total_count": 3721,
+        "valid_count": 3699,
+        "valid_percentage": 99.40876108572964
+      },
+      "score": 0.2201358545369694,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 4096,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 1,
+        "p2": 32,
+        "uniqueness": 0.95,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 55.04937065972222
+    },
+    {
+      "processing_ms": 98.29807898495346,
+      "roi": {
+        "error_m": -0.042624831199645996,
+        "mad_m": 0.01495903730392456,
+        "median_m": 0.957375168800354,
+        "total_count": 3721,
+        "valid_count": 3699,
+        "valid_percentage": 99.40876108572964
+      },
+      "score": 0.22026025774877497,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 8192,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 1,
+        "p2": 32,
+        "uniqueness": 0.95,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 54.800564236111114
+    },
+    {
+      "processing_ms": 98.29807898495346,
+      "roi": {
+        "error_m": -0.042624831199645996,
+        "mad_m": 0.01495903730392456,
+        "median_m": 0.957375168800354,
+        "total_count": 3721,
+        "valid_count": 3699,
+        "valid_percentage": 99.40876108572964
+      },
+      "score": 0.2207679074883583,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 16384,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 1,
+        "p2": 32,
+        "uniqueness": 0.95,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 53.78526475694444
+    },
+    {
+      "processing_ms": 98.29807898495346,
+      "roi": {
+        "error_m": -0.042624831199645996,
+        "mad_m": 0.01495903730392456,
+        "median_m": 0.957375168800354,
+        "total_count": 3721,
+        "valid_count": 3699,
+        "valid_percentage": 99.40876108572964
+      },
+      "score": 0.2223503727661361,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 32767,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 1,
+        "p2": 32,
+        "uniqueness": 0.95,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 50.620334201388886
+    },
+    {
+      "processing_ms": 83.07976799551398,
+      "roi": {
+        "error_m": -0.04139584302902222,
+        "mad_m": 0.009528040885925293,
+        "median_m": 0.9586041569709778,
+        "total_count": 3721,
+        "valid_count": 3673,
+        "valid_percentage": 98.7100241870465
+      },
+      "score": 0.22407027345495273,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 1,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 5,
+        "p2": 64,
+        "uniqueness": 0.9,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 24.3349609375
+    },
+    {
+      "processing_ms": 83.07976799551398,
+      "roi": {
+        "error_m": -0.04139584302902222,
+        "mad_m": 0.009528040885925293,
+        "median_m": 0.9586041569709778,
+        "total_count": 3721,
+        "valid_count": 3673,
+        "valid_percentage": 98.7100241870465
+      },
+      "score": 0.2241102040105083,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 4096,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 5,
+        "p2": 64,
+        "uniqueness": 0.9,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 24.25509982638889
+    },
+    {
+      "processing_ms": 83.07976799551398,
+      "roi": {
+        "error_m": -0.04139584302902222,
+        "mad_m": 0.009528040885925293,
+        "median_m": 0.9586041569709778,
+        "total_count": 3721,
+        "valid_count": 3673,
+        "valid_percentage": 98.7100241870465
+      },
+      "score": 0.2241602799653694,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 8192,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 5,
+        "p2": 64,
+        "uniqueness": 0.9,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 24.154947916666668
+    },
+    {
+      "processing_ms": 83.07976799551398,
+      "roi": {
+        "error_m": -0.04139584302902222,
+        "mad_m": 0.009528040885925293,
+        "median_m": 0.9586041569709778,
+        "total_count": 3721,
+        "valid_count": 3673,
+        "valid_percentage": 98.7100241870465
+      },
+      "score": 0.22423851347231386,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 16384,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 5,
+        "p2": 64,
+        "uniqueness": 0.9,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 23.99848090277778
+    },
+    {
+      "processing_ms": 83.07976799551398,
+      "roi": {
+        "error_m": -0.04139584302902222,
+        "mad_m": 0.009528040885925293,
+        "median_m": 0.9586041569709778,
+        "total_count": 3721,
+        "valid_count": 3673,
+        "valid_percentage": 98.7100241870465
+      },
+      "score": 0.22451515192717497,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 32767,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 5,
+        "p2": 64,
+        "uniqueness": 0.9,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 23.445203993055554
+    },
+    {
+      "processing_ms": 83.1043750513345,
+      "roi": {
+        "error_m": -0.04303377866744995,
+        "mad_m": 0.010911345481872559,
+        "median_m": 0.95696622133255,
+        "total_count": 3721,
+        "valid_count": 3625,
+        "valid_percentage": 97.42004837409299
+      },
+      "score": 0.23610621277186974,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 1,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 3,
+        "p2": 48,
+        "uniqueness": 0.9,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 25.2578125
+    },
+    {
+      "processing_ms": 83.1043750513345,
+      "roi": {
+        "error_m": -0.04303377866744995,
+        "mad_m": 0.010911345481872559,
+        "median_m": 0.95696622133255,
+        "total_count": 3721,
+        "valid_count": 3625,
+        "valid_percentage": 97.42004837409299
+      },
+      "score": 0.23614115200798086,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 4096,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 3,
+        "p2": 48,
+        "uniqueness": 0.9,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 25.187934027777775
+    },
+    {
+      "processing_ms": 83.1043750513345,
+      "roi": {
+        "error_m": -0.04303377866744995,
+        "mad_m": 0.010911345481872559,
+        "median_m": 0.95696622133255,
+        "total_count": 3721,
+        "valid_count": 3625,
+        "valid_percentage": 97.42004837409299
+      },
+      "score": 0.2361871589524253,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 8192,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 3,
+        "p2": 48,
+        "uniqueness": 0.9,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 25.09592013888889
+    },
+    {
+      "processing_ms": 83.1043750513345,
+      "roi": {
+        "error_m": -0.04303377866744995,
+        "mad_m": 0.010911345481872559,
+        "median_m": 0.95696622133255,
+        "total_count": 3721,
+        "valid_count": 3625,
+        "valid_percentage": 97.42004837409299
+      },
+      "score": 0.23628975226839752,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 16384,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 3,
+        "p2": 48,
+        "uniqueness": 0.9,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 24.890733506944446
+    },
+    {
+      "processing_ms": 83.1043750513345,
+      "roi": {
+        "error_m": -0.04303377866744995,
+        "mad_m": 0.010911345481872559,
+        "median_m": 0.95696622133255,
+        "total_count": 3721,
+        "valid_count": 3625,
+        "valid_percentage": 97.42004837409299
+      },
+      "score": 0.23666453525450865,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 32767,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 3,
+        "p2": 48,
+        "uniqueness": 0.9,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 24.14116753472222
+    },
+    {
+      "processing_ms": 86.48645807988942,
+      "roi": {
+        "error_m": -0.04057478904724121,
+        "mad_m": 0.006203174591064453,
+        "median_m": 0.9594252109527588,
+        "total_count": 3721,
+        "valid_count": 3360,
+        "valid_percentage": 90.2983069067455
+      },
+      "score": 0.24796683979563838,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 1,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 8,
+        "p2": 96,
+        "uniqueness": 0.8,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 10.673502604166666
+    },
+    {
+      "processing_ms": 86.48645807988942,
+      "roi": {
+        "error_m": -0.04057478904724121,
+        "mad_m": 0.006203174591064453,
+        "median_m": 0.9594252109527588,
+        "total_count": 3721,
+        "valid_count": 3360,
+        "valid_percentage": 90.2983069067455
+      },
+      "score": 0.24797845003869395,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 4096,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 8,
+        "p2": 96,
+        "uniqueness": 0.8,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 10.650282118055555
+    },
+    {
+      "processing_ms": 86.48645807988942,
+      "roi": {
+        "error_m": -0.04057478904724121,
+        "mad_m": 0.006203174591064453,
+        "median_m": 0.9594252109527588,
+        "total_count": 3721,
+        "valid_count": 3360,
+        "valid_percentage": 90.2983069067455
+      },
+      "score": 0.24798430941369395,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 8192,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 8,
+        "p2": 96,
+        "uniqueness": 0.8,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 10.638563368055555
+    },
+    {
+      "processing_ms": 86.48645807988942,
+      "roi": {
+        "error_m": -0.04057478904724121,
+        "mad_m": 0.006203174591064453,
+        "median_m": 0.9594252109527588,
+        "total_count": 3721,
+        "valid_count": 3360,
+        "valid_percentage": 90.2983069067455
+      },
+      "score": 0.24799526861508284,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 16384,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 8,
+        "p2": 96,
+        "uniqueness": 0.8,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 10.616644965277777
+    },
+    {
+      "processing_ms": 86.48645807988942,
+      "roi": {
+        "error_m": -0.04057478904724121,
+        "mad_m": 0.006203174591064453,
+        "median_m": 0.9594252109527588,
+        "total_count": 3721,
+        "valid_count": 3360,
+        "valid_percentage": 90.2983069067455
+      },
+      "score": 0.24801707851091617,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 32767,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 8,
+        "p2": 96,
+        "uniqueness": 0.8,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 10.57302517361111
+    },
+    {
+      "processing_ms": 103.12652494758368,
+      "roi": {
+        "error_m": -0.04507333040237427,
+        "mad_m": 0.015301942825317383,
+        "median_m": 0.9549266695976257,
+        "total_count": 3721,
+        "valid_count": 3475,
+        "valid_percentage": 93.38887395861327
+      },
+      "score": 0.26193936024089415,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 1,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 1,
+        "p2": 32,
+        "uniqueness": 0.9,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 28.468098958333332
+    },
+    {
+      "processing_ms": 103.12652494758368,
+      "roi": {
+        "error_m": -0.04507333040237427,
+        "mad_m": 0.015301942825317383,
+        "median_m": 0.9549266695976257,
+        "total_count": 3721,
+        "valid_count": 3475,
+        "valid_percentage": 93.38887395861327
+      },
+      "score": 0.2619589457443664,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 4096,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 1,
+        "p2": 32,
+        "uniqueness": 0.9,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 28.42892795138889
+    },
+    {
+      "processing_ms": 103.12652494758368,
+      "roi": {
+        "error_m": -0.04507333040237427,
+        "mad_m": 0.015301942825317383,
+        "median_m": 0.9549266695976257,
+        "total_count": 3721,
+        "valid_count": 3475,
+        "valid_percentage": 93.38887395861327
+      },
+      "score": 0.2619887309006164,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 8192,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 1,
+        "p2": 32,
+        "uniqueness": 0.9,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 28.369357638888886
+    },
+    {
+      "processing_ms": 103.12652494758368,
+      "roi": {
+        "error_m": -0.04507333040237427,
+        "mad_m": 0.015301942825317383,
+        "median_m": 0.9549266695976257,
+        "total_count": 3721,
+        "valid_count": 3475,
+        "valid_percentage": 93.38887395861327
+      },
+      "score": 0.2621479105881164,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 16384,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 1,
+        "p2": 32,
+        "uniqueness": 0.9,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 28.05099826388889
+    },
+    {
+      "processing_ms": 103.12652494758368,
+      "roi": {
+        "error_m": -0.04507333040237427,
+        "mad_m": 0.015301942825317383,
+        "median_m": 0.9549266695976257,
+        "total_count": 3721,
+        "valid_count": 3475,
+        "valid_percentage": 93.38887395861327
+      },
+      "score": 0.26266695355686637,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 32767,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 1,
+        "p2": 32,
+        "uniqueness": 0.9,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 27.01291232638889
+    },
+    {
+      "processing_ms": 94.22791993711144,
+      "roi": {
+        "error_m": -0.042420148849487305,
+        "mad_m": 0.009523212909698486,
+        "median_m": 0.9575798511505127,
+        "total_count": 3721,
+        "valid_count": 3258,
+        "valid_percentage": 87.5571083042193
+      },
+      "score": 0.2690310836979524,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 1,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 5,
+        "p2": 64,
+        "uniqueness": 0.8,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 10.1796875
+    },
+    {
+      "processing_ms": 94.22791993711144,
+      "roi": {
+        "error_m": -0.042420148849487305,
+        "mad_m": 0.009523212909698486,
+        "median_m": 0.9575798511505127,
+        "total_count": 3721,
+        "valid_count": 3258,
+        "valid_percentage": 87.5571083042193
+      },
+      "score": 0.2690438875173969,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 4096,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 5,
+        "p2": 64,
+        "uniqueness": 0.8,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 10.15407986111111
+    },
+    {
+      "processing_ms": 94.22791993711144,
+      "roi": {
+        "error_m": -0.042420148849487305,
+        "mad_m": 0.009523212909698486,
+        "median_m": 0.9575798511505127,
+        "total_count": 3721,
+        "valid_count": 3258,
+        "valid_percentage": 87.5571083042193
+      },
+      "score": 0.26904974689239686,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 8192,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 5,
+        "p2": 64,
+        "uniqueness": 0.8,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 10.142361111111112
+    },
+    {
+      "processing_ms": 94.22791993711144,
+      "roi": {
+        "error_m": -0.042420148849487305,
+        "mad_m": 0.009523212909698486,
+        "median_m": 0.9575798511505127,
+        "total_count": 3721,
+        "valid_count": 3258,
+        "valid_percentage": 87.5571083042193
+      },
+      "score": 0.2690647751042024,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 16384,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 5,
+        "p2": 64,
+        "uniqueness": 0.8,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 10.1123046875
+    },
+    {
+      "processing_ms": 94.22791993711144,
+      "roi": {
+        "error_m": -0.042420148849487305,
+        "mad_m": 0.009523212909698486,
+        "median_m": 0.9575798511505127,
+        "total_count": 3721,
+        "valid_count": 3258,
+        "valid_percentage": 87.5571083042193
+      },
+      "score": 0.2691036205903135,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 32767,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 5,
+        "p2": 64,
+        "uniqueness": 0.8,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 10.034613715277779
+    },
+    {
+      "processing_ms": 92.88862999528646,
+      "roi": {
+        "error_m": -0.04425853490829468,
+        "mad_m": 0.011137247085571289,
+        "median_m": 0.9557414650917053,
+        "total_count": 3721,
+        "valid_count": 3038,
+        "valid_percentage": 81.64471916151572
+      },
+      "score": 0.29663520915948594,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 1,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 3,
+        "p2": 48,
+        "uniqueness": 0.8,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 9.914605034722221
+    },
+    {
+      "processing_ms": 92.88862999528646,
+      "roi": {
+        "error_m": -0.04425853490829468,
+        "mad_m": 0.011137247085571289,
+        "median_m": 0.9557414650917053,
+        "total_count": 3721,
+        "valid_count": 3038,
+        "valid_percentage": 81.64471916151572
+      },
+      "score": 0.2966461141074026,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 4096,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 3,
+        "p2": 48,
+        "uniqueness": 0.8,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 9.89279513888889
+    },
+    {
+      "processing_ms": 92.88862999528646,
+      "roi": {
+        "error_m": -0.04425853490829468,
+        "mad_m": 0.011137247085571289,
+        "median_m": 0.9557414650917053,
+        "total_count": 3721,
+        "valid_count": 3038,
+        "valid_percentage": 81.64471916151572
+      },
+      "score": 0.2966500203574026,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 8192,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 3,
+        "p2": 48,
+        "uniqueness": 0.8,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 9.88498263888889
+    },
+    {
+      "processing_ms": 92.88862999528646,
+      "roi": {
+        "error_m": -0.04425853490829468,
+        "mad_m": 0.011137247085571289,
+        "median_m": 0.9557414650917053,
+        "total_count": 3721,
+        "valid_count": 3038,
+        "valid_percentage": 81.64471916151572
+      },
+      "score": 0.29667020264906924,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 16384,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 3,
+        "p2": 48,
+        "uniqueness": 0.8,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 9.844618055555555
+    },
+    {
+      "processing_ms": 92.88862999528646,
+      "roi": {
+        "error_m": -0.04425853490829468,
+        "mad_m": 0.011137247085571289,
+        "median_m": 0.9557414650917053,
+        "total_count": 3721,
+        "valid_count": 3038,
+        "valid_percentage": 81.64471916151572
+      },
+      "score": 0.29672651775323594,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 32767,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 3,
+        "p2": 48,
+        "uniqueness": 0.8,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 9.731987847222221
+    },
+    {
+      "processing_ms": 108.03119605407119,
+      "roi": {
+        "error_m": -0.04750937223434448,
+        "mad_m": 0.015536248683929443,
+        "median_m": 0.9524906277656555,
+        "total_count": 3721,
+        "valid_count": 2599,
+        "valid_percentage": 69.84681537221176
+      },
+      "score": 0.3518904420060367,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 1,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 1,
+        "p2": 32,
+        "uniqueness": 0.8,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 10.303819444444445
+    },
+    {
+      "processing_ms": 108.03119605407119,
+      "roi": {
+        "error_m": -0.04750937223434448,
+        "mad_m": 0.015536248683929443,
+        "median_m": 0.9524906277656555,
+        "total_count": 3721,
+        "valid_count": 2599,
+        "valid_percentage": 69.84681537221176
+      },
+      "score": 0.3518964098879811,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 4096,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 1,
+        "p2": 32,
+        "uniqueness": 0.8,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 10.291883680555555
+    },
+    {
+      "processing_ms": 108.03119605407119,
+      "roi": {
+        "error_m": -0.04750937223434448,
+        "mad_m": 0.015536248683929443,
+        "median_m": 0.9524906277656555,
+        "total_count": 3721,
+        "valid_count": 2599,
+        "valid_percentage": 69.84681537221176
+      },
+      "score": 0.3518989598011756,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 8192,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 1,
+        "p2": 32,
+        "uniqueness": 0.8,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 10.286783854166668
+    },
+    {
+      "processing_ms": 108.03119605407119,
+      "roi": {
+        "error_m": -0.04750937223434448,
+        "mad_m": 0.015536248683929443,
+        "median_m": 0.9524906277656555,
+        "total_count": 3721,
+        "valid_count": 2599,
+        "valid_percentage": 69.84681537221176
+      },
+      "score": 0.35193319374214777,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 16384,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 1,
+        "p2": 32,
+        "uniqueness": 0.8,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 10.218315972222221
+    },
+    {
+      "processing_ms": 108.03119605407119,
+      "roi": {
+        "error_m": -0.04750937223434448,
+        "mad_m": 0.015536248683929443,
+        "median_m": 0.9524906277656555,
+        "total_count": 3721,
+        "valid_count": 2599,
+        "valid_percentage": 69.84681537221176
+      },
+      "score": 0.35202065033937,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 32767,
+        "include_diagonals": false,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 1,
+        "p2": 32,
+        "uniqueness": 0.8,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      },
+      "whole_frame_valid_percentage": 10.043402777777779
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 1,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 1,
+        "p2": 32,
+        "uniqueness": -1.0,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 4096,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 1,
+        "p2": 32,
+        "uniqueness": -1.0,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 8192,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 1,
+        "p2": 32,
+        "uniqueness": -1.0,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 16384,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 1,
+        "p2": 32,
+        "uniqueness": -1.0,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 32767,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 1,
+        "p2": 32,
+        "uniqueness": -1.0,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 1,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 1,
+        "p2": 32,
+        "uniqueness": 0.8,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 4096,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 1,
+        "p2": 32,
+        "uniqueness": 0.8,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 8192,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 1,
+        "p2": 32,
+        "uniqueness": 0.8,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 16384,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 1,
+        "p2": 32,
+        "uniqueness": 0.8,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 32767,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 1,
+        "p2": 32,
+        "uniqueness": 0.8,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 1,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 1,
+        "p2": 32,
+        "uniqueness": 0.9,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 4096,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 1,
+        "p2": 32,
+        "uniqueness": 0.9,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 8192,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 1,
+        "p2": 32,
+        "uniqueness": 0.9,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 16384,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 1,
+        "p2": 32,
+        "uniqueness": 0.9,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 32767,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 1,
+        "p2": 32,
+        "uniqueness": 0.9,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 1,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 1,
+        "p2": 32,
+        "uniqueness": 0.95,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 4096,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 1,
+        "p2": 32,
+        "uniqueness": 0.95,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 8192,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 1,
+        "p2": 32,
+        "uniqueness": 0.95,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 16384,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 1,
+        "p2": 32,
+        "uniqueness": 0.95,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 32767,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 1,
+        "p2": 32,
+        "uniqueness": 0.95,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 1,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 3,
+        "p2": 48,
+        "uniqueness": -1.0,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 4096,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 3,
+        "p2": 48,
+        "uniqueness": -1.0,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 8192,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 3,
+        "p2": 48,
+        "uniqueness": -1.0,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 16384,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 3,
+        "p2": 48,
+        "uniqueness": -1.0,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 32767,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 3,
+        "p2": 48,
+        "uniqueness": -1.0,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 1,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 3,
+        "p2": 48,
+        "uniqueness": 0.8,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 4096,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 3,
+        "p2": 48,
+        "uniqueness": 0.8,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 8192,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 3,
+        "p2": 48,
+        "uniqueness": 0.8,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 16384,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 3,
+        "p2": 48,
+        "uniqueness": 0.8,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 32767,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 3,
+        "p2": 48,
+        "uniqueness": 0.8,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 1,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 3,
+        "p2": 48,
+        "uniqueness": 0.9,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 4096,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 3,
+        "p2": 48,
+        "uniqueness": 0.9,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 8192,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 3,
+        "p2": 48,
+        "uniqueness": 0.9,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 16384,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 3,
+        "p2": 48,
+        "uniqueness": 0.9,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 32767,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 3,
+        "p2": 48,
+        "uniqueness": 0.9,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 1,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 3,
+        "p2": 48,
+        "uniqueness": 0.95,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 4096,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 3,
+        "p2": 48,
+        "uniqueness": 0.95,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 8192,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 3,
+        "p2": 48,
+        "uniqueness": 0.95,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 16384,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 3,
+        "p2": 48,
+        "uniqueness": 0.95,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 32767,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 3,
+        "p2": 48,
+        "uniqueness": 0.95,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 1,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 5,
+        "p2": 64,
+        "uniqueness": -1.0,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 4096,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 5,
+        "p2": 64,
+        "uniqueness": -1.0,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 8192,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 5,
+        "p2": 64,
+        "uniqueness": -1.0,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 16384,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 5,
+        "p2": 64,
+        "uniqueness": -1.0,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 32767,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 5,
+        "p2": 64,
+        "uniqueness": -1.0,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 1,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 5,
+        "p2": 64,
+        "uniqueness": 0.8,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 4096,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 5,
+        "p2": 64,
+        "uniqueness": 0.8,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 8192,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 5,
+        "p2": 64,
+        "uniqueness": 0.8,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 16384,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 5,
+        "p2": 64,
+        "uniqueness": 0.8,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 32767,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 5,
+        "p2": 64,
+        "uniqueness": 0.8,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 1,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 5,
+        "p2": 64,
+        "uniqueness": 0.9,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 4096,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 5,
+        "p2": 64,
+        "uniqueness": 0.9,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 8192,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 5,
+        "p2": 64,
+        "uniqueness": 0.9,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 16384,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 5,
+        "p2": 64,
+        "uniqueness": 0.9,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 32767,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 5,
+        "p2": 64,
+        "uniqueness": 0.9,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 1,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 5,
+        "p2": 64,
+        "uniqueness": 0.95,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 4096,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 5,
+        "p2": 64,
+        "uniqueness": 0.95,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 8192,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 5,
+        "p2": 64,
+        "uniqueness": 0.95,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 16384,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 5,
+        "p2": 64,
+        "uniqueness": 0.95,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 32767,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 5,
+        "p2": 64,
+        "uniqueness": 0.95,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 1,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 8,
+        "p2": 96,
+        "uniqueness": -1.0,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 4096,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 8,
+        "p2": 96,
+        "uniqueness": -1.0,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 8192,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 8,
+        "p2": 96,
+        "uniqueness": -1.0,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 16384,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 8,
+        "p2": 96,
+        "uniqueness": -1.0,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 32767,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 8,
+        "p2": 96,
+        "uniqueness": -1.0,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 1,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 8,
+        "p2": 96,
+        "uniqueness": 0.8,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 4096,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 8,
+        "p2": 96,
+        "uniqueness": 0.8,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 8192,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 8,
+        "p2": 96,
+        "uniqueness": 0.8,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 16384,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 8,
+        "p2": 96,
+        "uniqueness": 0.8,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 32767,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 8,
+        "p2": 96,
+        "uniqueness": 0.8,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 1,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 8,
+        "p2": 96,
+        "uniqueness": 0.9,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 4096,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 8,
+        "p2": 96,
+        "uniqueness": 0.9,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 8192,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 8,
+        "p2": 96,
+        "uniqueness": 0.9,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 16384,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 8,
+        "p2": 96,
+        "uniqueness": 0.9,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 32767,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 8,
+        "p2": 96,
+        "uniqueness": 0.9,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 1,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 8,
+        "p2": 96,
+        "uniqueness": 0.95,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 4096,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 8,
+        "p2": 96,
+        "uniqueness": 0.95,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 8192,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 8,
+        "p2": 96,
+        "uniqueness": 0.95,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 16384,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 8,
+        "p2": 96,
+        "uniqueness": 0.95,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    },
+    {
+      "error": "VPI CUDA stereo failed: VPI_ERROR_INTERNAL: CUDA run-time error: out of memory",
+      "score": null,
+      "settings": {
+        "backend": "vpi-cuda",
+        "confidence_threshold": 32767,
+        "include_diagonals": true,
+        "max_disparity": 256,
+        "min_disparity": 0,
+        "p1": 8,
+        "p2": 96,
+        "uniqueness": 0.95,
+        "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+      }
+    }
+  ],
+  "roi_center": [
+    640,
+    360
+  ],
+  "roi_size_px": 61,
+  "warning": "Verify the profile live at every navigation threshold.",
+  "window_note": "VPI 3 CUDA uses a fixed 9x7 census window."
+}

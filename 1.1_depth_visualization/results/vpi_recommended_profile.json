@@ -1,9 +1,9 @@
 {
   "backend": "vpi-cuda",
-  "calibration_sha256": "3f892706c9130a221e53f8248421498175bd13c633ad13b7b9b0e0ca9e2a4dba",
+  "calibration_sha256": "8198efd156491578afda3b11a9f2fe9c44d150663e6347676830a14dde4cff2e",
   "known_distance_m": 1.0,
   "schema_version": 1,
-  "score": 0.1819594201860757,
+  "score": 0.19205244769500052,
   "settings": {
     "confidence_threshold": 1,
     "include_diagonals": false,

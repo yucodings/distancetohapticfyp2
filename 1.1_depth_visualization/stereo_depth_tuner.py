@@ -36,6 +36,13 @@ from tuner_core import (
     settings_dict,
     vpi_autotune_candidates,
 )
+from pointcloud_utils import (
+    disparity_to_xyz,
+    make_orthographic_view,
+    sample_point_cloud,
+    save_binary_ply,
+    show_open3d_snapshot,
+)
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -45,6 +52,7 @@ CONTROL_WINDOW = "Stereo tuner controls"
 DASHBOARD_WINDOW = "IMX219 stereo depth tuner"
 ALIGNMENT_WINDOW = "Rectification check: LEFT green | RIGHT red"
 AUTO_WINDOW = "Easy Mode automatic tuning"
+POINT_CLOUD_WINDOW = "3D diagnostic: top and front projections"
 PRODUCTION_VPI_PROFILE = SCRIPT_DIR.parent / "3.0_imx219" / "vpi_tuned_profile.json"
 
 
@@ -61,6 +69,16 @@ class TimedFrame:
     sequence: int
     timestamp: float
     image: np.ndarray
+
+
+def point_cloud_from_result(
+    disparity: np.ndarray,
+    valid: np.ndarray,
+    color_bgr: np.ndarray,
+    q_matrix: np.ndarray,
+):
+    xyz, xyz_valid = disparity_to_xyz(disparity, q_matrix, valid)
+    return sample_point_cloud(xyz, color_bgr, xyz_valid, stride=4)
 
 
 def gstreamer_pipeline(sensor_id: int, calibration) -> str:
@@ -399,6 +417,10 @@ def save_result(
     np.save(str(output / "disparity_float32.npy"), disparity.astype(np.float32))
     np.save(str(output / "depth_metres_float32.npy"), depth.astype(np.float32))
     np.save(str(output / "valid_mask.npy"), valid.astype(np.uint8))
+    cloud = point_cloud_from_result(
+        disparity, valid, left_rectified, calibration.q_matrix
+    )
+    save_binary_ply(output / "point_cloud.ply", cloud)
     report = {
         "created_at": datetime.now().isoformat(timespec="seconds"),
         "calibration": {
@@ -608,6 +630,12 @@ def run_easy_autotune(
     np.save(str(output / "best_disparity_float32.npy"), disparity.astype(np.float32))
     np.save(str(output / "best_depth_metres_float32.npy"), depth.astype(np.float32))
     np.save(str(output / "best_valid_mask.npy"), valid.astype(np.uint8))
+    save_binary_ply(
+        output / "best_point_cloud.ply",
+        point_cloud_from_result(
+            disparity, valid, left_rectified, calibration.q_matrix
+        ),
+    )
     ranked = sorted(
         records,
         key=lambda item: float("inf") if item["score"] is None else item["score"],
@@ -855,6 +883,12 @@ def run_vpi_easy_autotune(
     np.save(str(output / "best_depth_metres_float32.npy"), depth.astype(np.float32))
     np.save(str(output / "best_valid_mask.npy"), valid.astype(np.uint8))
     np.save(str(output / "best_confidence_u16.npy"), confidence.astype(np.uint16))
+    save_binary_ply(
+        output / "best_point_cloud.ply",
+        point_cloud_from_result(
+            disparity, valid, left_rectified, calibration.q_matrix
+        ),
+    )
 
     ranked = sorted(
         records,
@@ -996,7 +1030,8 @@ def main() -> int:
     cv2.setMouseCallback(DASHBOARD_WINDOW, mouse)
     print(
         "A automatic Easy Mode | SPACE freeze/live | B backend | "
-        "S save evidence | R reset ROI | Q quit"
+        "P 3D projections | O Open3D snapshot | S save evidence | "
+        "R reset ROI | Q quit"
     )
 
     vpi_matcher: Optional[VpiCudaMatcher] = None
@@ -1004,6 +1039,9 @@ def main() -> int:
     last_pair_sequence = -1
     computed = None
     status_message = "Ready"
+    show_3d = False
+    cloud_cache_key = None
+    cloud_cache = None
     try:
         while True:
             if not frozen and capture is not None:
@@ -1106,6 +1144,24 @@ def main() -> int:
                     roi_size,
                     known_distance,
                 )
+                current_cloud_key = (
+                    processed_pair.sequence,
+                    shown_backend,
+                    shown_settings,
+                )
+                if show_3d:
+                    if cloud_cache_key != current_cloud_key:
+                        cloud_cache = point_cloud_from_result(
+                            disparity,
+                            valid,
+                            left_rectified,
+                            calibration.q_matrix,
+                        )
+                        cloud_cache_key = current_cloud_key
+                    cv2.imshow(
+                        POINT_CLOUD_WINDOW,
+                        make_orthographic_view(cloud_cache),
+                    )
                 depth_pane = fit_pane(depth_view)
                 draw_roi(depth_pane, tuple(inspection), roi_size, depth.shape)
                 top = cv2.hconcat(
@@ -1154,7 +1210,7 @@ def main() -> int:
                     f"ROI ({inspection[0]}, {inspection[1]}) {roi_size}px: {median_text}, "
                     f"valid {stats.valid_percentage:.1f}%, {error_text}",
                     warning,
-                    f"{status_message} | A auto | SPACE freeze/live | B backend | S save | Q quit",
+                    f"{status_message} | A auto | P 3D | O Open3D | S save | Q quit",
                 ]
                 dashboard = cv2.vconcat([top, bottom, text_panel(1280, lines)])
                 cv2.imshow(DASHBOARD_WINDOW, dashboard)
@@ -1196,6 +1252,33 @@ def main() -> int:
                 cv2.setTrackbarPos("Backend 0=SGBM 1=VPI", CONTROL_WINDOW, 1 - current)
             elif key == ord("r"):
                 inspection[:] = [calibration.width // 2, calibration.height // 2]
+            elif key == ord("p"):
+                show_3d = not show_3d
+                cloud_cache_key = None
+                if not show_3d:
+                    try:
+                        cv2.destroyWindow(POINT_CLOUD_WINDOW)
+                    except cv2.error:
+                        pass
+                status_message = (
+                    "3D projections enabled"
+                    if show_3d
+                    else "3D projections disabled"
+                )
+            elif key == ord("o") and computed is not None:
+                try:
+                    cloud_cache = point_cloud_from_result(
+                        disparity,
+                        valid,
+                        left_rectified,
+                        calibration.q_matrix,
+                    )
+                    cloud_cache_key = current_cloud_key
+                    show_open3d_snapshot(cloud_cache)
+                    status_message = "Open3D snapshot closed"
+                except Exception as error:
+                    status_message = f"Open3D unavailable: {error}"
+                    print(status_message)
             elif key == ord("a"):
                 if known_distance is None:
                     status_message = (
