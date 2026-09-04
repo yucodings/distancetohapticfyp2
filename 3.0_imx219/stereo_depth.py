@@ -8,17 +8,13 @@ import threading
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable, Optional
+from typing import Callable, Optional
 
 from calibration import Calibration, RectificationMaps, rectify_right
 from camera_backend import cv2, np
 from config import (
-    ALLOW_OPENCV_STEREO_FALLBACK,
     MAX_VALID_DEPTH,
     MIN_VALID_DEPTH,
-    SGBM_BLOCK_SIZE,
-    SGBM_MIN_DISPARITY,
-    SGBM_NUM_DISPARITIES,
     VPI_DISPARITY_SAFETY_MARGIN_PX,
     VPI_INCLUDE_DIAGONALS,
     VPI_INTERNAL_CONFIDENCE_THRESHOLD,
@@ -171,7 +167,6 @@ class DepthResult:
     depth_view: np.ndarray
     depth_fps: float
     valid_percentage: float
-    backend_name: str
     diagnostic_lines: tuple[str, ...]
 
 
@@ -197,59 +192,6 @@ def vpi_disparity_masks(
     )
     sentinel = finite & (disparity >= max_disparity)
     return safe, near_limit, sentinel
-
-
-class OpenCvStereoEngine:
-    name = "OpenCV CPU StereoSGBM"
-
-    def __init__(self):
-        if SGBM_NUM_DISPARITIES <= 0 or SGBM_NUM_DISPARITIES % 16:
-            raise ValueError(
-                "SGBM_NUM_DISPARITIES must be a positive multiple of 16"
-            )
-        if SGBM_BLOCK_SIZE < 3 or SGBM_BLOCK_SIZE % 2 == 0:
-            raise ValueError("SGBM_BLOCK_SIZE must be odd and at least 3")
-        self.minimum_disparity = SGBM_MIN_DISPARITY
-        self.maximum_disparity = (
-            SGBM_MIN_DISPARITY + SGBM_NUM_DISPARITIES
-        )
-        self.matcher = cv2.StereoSGBM_create(
-            minDisparity=SGBM_MIN_DISPARITY,
-            numDisparities=SGBM_NUM_DISPARITIES,
-            blockSize=SGBM_BLOCK_SIZE,
-            P1=8 * SGBM_BLOCK_SIZE * SGBM_BLOCK_SIZE,
-            P2=32 * SGBM_BLOCK_SIZE * SGBM_BLOCK_SIZE,
-            disp12MaxDiff=1,
-            uniquenessRatio=10,
-            speckleWindowSize=100,
-            speckleRange=2,
-            preFilterCap=63,
-            mode=cv2.STEREO_SGBM_MODE_SGBM_3WAY,
-        )
-        self._positive_percentage = 0.0
-
-    def warmup(self) -> None:
-        return
-
-    def compute(
-        self, left: np.ndarray, right: np.ndarray
-    ) -> tuple[np.ndarray, Optional[np.ndarray]]:
-        left_gray = cv2.cvtColor(left, cv2.COLOR_BGR2GRAY)
-        right_gray = cv2.cvtColor(right, cv2.COLOR_BGR2GRAY)
-        raw = self.matcher.compute(left_gray, right_gray)
-        if raw is None or raw.size == 0:
-            raise RuntimeError("StereoSGBM returned no disparity")
-        disparity = raw.astype(np.float32) / 16.0
-        plausible = (
-            np.isfinite(disparity)
-            & (disparity > self.minimum_disparity)
-            & (disparity < self.maximum_disparity)
-        )
-        self._positive_percentage = 100.0 * float(np.mean(plausible))
-        return disparity, None
-
-    def diagnostics(self) -> tuple[str, ...]:
-        return (f"SGBM plausible disparity: {self._positive_percentage:.1f}%",)
 
 
 class VpiCudaStereoEngine:
@@ -350,8 +292,8 @@ def calculate_depth(
     disparity: np.ndarray,
     q_matrix: np.ndarray,
     confidence_mask: Optional[np.ndarray] = None,
-    min_disparity: int = SGBM_MIN_DISPARITY,
-    max_disparity: int = SGBM_MIN_DISPARITY + SGBM_NUM_DISPARITIES,
+    min_disparity: int = VPI_MIN_DISPARITY,
+    max_disparity: int = VPI_MAX_DISPARITY,
 ) -> tuple[np.ndarray, np.ndarray]:
     """Calculate forward Z from canonical Q and reject invalid ranges."""
     if disparity.ndim != 2:
@@ -402,15 +344,11 @@ def make_depth_view(depth: np.ndarray, valid: np.ndarray) -> np.ndarray:
     return view
 
 
-def create_engine(backend: str, calibration: Calibration) -> Any:
-    if backend == "vpi-cuda":
-        settings, source = load_vpi_runtime_settings(calibration)
-        return VpiCudaStereoEngine(
-            calibration.width, calibration.height, settings, source
-        )
-    if backend == "opencv":
-        return OpenCvStereoEngine()
-    raise ValueError(f"Unknown stereo backend: {backend}")
+def create_vpi_engine(calibration: Calibration) -> VpiCudaStereoEngine:
+    settings, source = load_vpi_runtime_settings(calibration)
+    return VpiCudaStereoEngine(
+        calibration.width, calibration.height, settings, source
+    )
 
 
 class AsyncDepthProcessor:
@@ -418,16 +356,13 @@ class AsyncDepthProcessor:
 
     def __init__(
         self,
-        backend: str,
         calibration: Calibration,
         maps: RectificationMaps,
         status_callback: Optional[StatusCallback] = None,
     ):
-        self.backend = backend
         self.calibration = calibration
         self.maps = maps
         self.status_callback = status_callback
-        self.backend_name = backend
         self._condition = threading.Condition()
         self._ready = threading.Event()
         self._running = False
@@ -489,22 +424,12 @@ class AsyncDepthProcessor:
             return (f"Depth input replacements: {self._replaced_inputs}",)
 
     def _run(self) -> None:
-        engine: Optional[Any] = None
+        engine: Optional[VpiCudaStereoEngine] = None
         previous_completion: Optional[float] = None
         smoothed_fps = 0.0
         try:
-            try:
-                engine = create_engine(self.backend, self.calibration)
-                engine.warmup()
-            except Exception as primary_error:
-                if self.backend != "vpi-cuda" or not ALLOW_OPENCV_STEREO_FALLBACK:
-                    raise
-                self._status(
-                    f"VPI unavailable ({primary_error}); using OpenCV stereo fallback"
-                )
-                engine = OpenCvStereoEngine()
-                engine.warmup()
-            self.backend_name = engine.name
+            engine = create_vpi_engine(self.calibration)
+            engine.warmup()
             self._status(f"Stereo depth ready | {engine.name}")
             self._ready.set()
 
@@ -549,7 +474,6 @@ class AsyncDepthProcessor:
                     depth_view=make_depth_view(depth, valid),
                     depth_fps=smoothed_fps,
                     valid_percentage=100.0 * float(np.mean(valid)),
-                    backend_name=engine.name,
                     diagnostic_lines=engine.diagnostics(),
                 )
                 with self._condition:

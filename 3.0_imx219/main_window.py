@@ -144,7 +144,7 @@ class MainWindow(QMainWindow):
         zone_title = QLabel("Zone Values")
         zone_title.setObjectName("panelTitle")
         zone_subtitle = QLabel(
-            "Nearest supported stereo depth (thresholds: 2.0 / 1.5 / 0.5 m)"
+            "One current nearest depth per column (thresholds: 2.0 / 1.5 / 0.5 m)"
         )
         zone_subtitle.setObjectName("panelSubtitle")
         zone_grid = QGridLayout()
@@ -379,9 +379,6 @@ class MainWindow(QMainWindow):
         if "ready" in normalized and "vpi" in normalized:
             display_status = "Stereo · VPI CUDA"
             colors = "background:#dcfce7; color:#166534;"
-        elif "ready" in normalized or "fallback" in normalized:
-            display_status = "Stereo · SGBM CPU"
-            colors = "background:#fef3c7; color:#92400e;"
         elif "loading" in normalized or "starting" in normalized:
             display_status = "Stereo · Loading"
             colors = "background:#dbeafe; color:#1d4ed8;"

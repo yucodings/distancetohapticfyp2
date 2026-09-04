@@ -27,21 +27,33 @@ from config import (
     LEFT_SENSOR_ID,
     LOG_EVERY_N_RESULTS,
     RIGHT_SENSOR_ID,
-    STEREO_BACKEND,
     WIDTH,
     YOLO_FRAME_INTERVAL,
     YOLO_RESULT_MAX_AGE_MS,
     ZONE_KEYS,
 )
-from data_models import DetectionResult, FramePacket, MotorPattern, SceneResult, ZoneResult
-from hazard_policy import pattern_from_depth
+from data_models import (
+    DetectionResult,
+    FramePacket,
+    GridCellResult,
+    MotorPattern,
+    PATTERN_OFF,
+    SceneResult,
+    ZoneResult,
+)
+from hazard_policy import pattern_from_depth_hysteresis
 from stereo_capture import (
     SynchronizedStereoCapture,
     open_cameras,
     validate_frame_resolution,
 )
 from stereo_depth import AsyncDepthProcessor, DepthResult
-from zone_depth import compute_stereo_depth_zones, empty_stereo_zones
+from zone_depth import (
+    WinnerSwitchTracker,
+    compute_stereo_depth_grid,
+    empty_depth_grid,
+    empty_stereo_zones,
+)
 
 if TYPE_CHECKING:
     from inference_worker import LatestFrameInferenceWorker
@@ -72,7 +84,9 @@ class StreamWorker(QObject):
         self.maps: Optional[RectificationMaps] = None
         self.latest_depth: Optional[DepthResult] = None
         self.latest_scene: Optional[SceneResult] = None
-        self.last_pattern_names = {zone_name: None for zone_name in ZONE_KEYS}
+        self.last_pattern_states = {zone_name: None for zone_name in ZONE_KEYS}
+        self.last_patterns = {zone_name: PATTERN_OFF for zone_name in ZONE_KEYS}
+        self.grid_tracker = WinnerSwitchTracker()
 
     def stop(self) -> None:
         self._running = False
@@ -155,6 +169,7 @@ class StreamWorker(QObject):
         self,
         frame: np.ndarray,
         zones: Dict[str, ZoneResult],
+        cells: Dict[str, GridCellResult],
         detections: List[DetectionResult],
     ) -> np.ndarray:
         output = frame.copy()
@@ -174,6 +189,17 @@ class StreamWorker(QObject):
             if zone.tone in fill_map:
                 color, alpha = fill_map[zone.tone]
                 self.blend_zone(output, zone.rect, color, alpha)
+
+        for cell in cells.values():
+            x1, y1, x2, y2 = cell.rect
+            border_color = (255, 220, 60) if cell.selected else (175, 175, 175)
+            cv2.rectangle(
+                output,
+                (x1, y1),
+                (x2, y2),
+                border_color,
+                3 if cell.selected else 1,
+            )
 
         for zone in zones.values():
             x1, y1, x2, y2 = zone.rect
@@ -208,13 +234,13 @@ class StreamWorker(QObject):
         cv2.rectangle(
             output,
             (8, output.shape[0] - 38),
-            (260, output.shape[0] - 8),
+            (350, output.shape[0] - 8),
             (20, 20, 20),
             -1,
         )
         cv2.putText(
             output,
-            "Blue dot = supported stereo surface",
+            "Blue dot = stable nearest column depth",
             (16, output.shape[0] - 16),
             cv2.FONT_HERSHEY_SIMPLEX,
             0.42,
@@ -239,10 +265,14 @@ class StreamWorker(QObject):
     def _patterns_for_zones(
         self, zones: Dict[str, ZoneResult]
     ) -> Dict[str, MotorPattern]:
-        return {
-            zone_name: pattern_from_depth(zones[zone_name].depth_m)
-            for zone_name in ZONE_KEYS
-        }
+        patterns: Dict[str, MotorPattern] = {}
+        for zone_name in ZONE_KEYS:
+            patterns[zone_name] = pattern_from_depth_hysteresis(
+                zones[zone_name].depth_m,
+                self.last_patterns[zone_name],
+            )
+        self.last_patterns.update(patterns)
+        return patterns
 
     def _apply_patterns(
         self,
@@ -253,24 +283,31 @@ class StreamWorker(QObject):
         if self.actuators is not None:
             self.actuators.update_patterns(patterns)
         for zone_name, pattern in patterns.items():
-            if self.last_pattern_names[zone_name] == pattern.name:
+            state = (pattern.name, zones[zone_name].source_cell)
+            if self.last_pattern_states[zone_name] == state:
                 continue
             depth = zones[zone_name].depth_m
             distance = "invalid" if depth is None else f"{depth:.3f} m"
+            source = zones[zone_name].source_cell or "--"
             self._log(
                 f"STEREO-DEPTH {zone_name.upper()} actuator -> {pattern.name} | "
-                f"depth={distance} | strength=0x{pattern.level:02X} | {reason}"
+                f"cell={source} | depth={distance} | "
+                f"strength=0x{pattern.level:02X} | {reason}"
             )
-            self.last_pattern_names[zone_name] = pattern.name
+            self.last_pattern_states[zone_name] = state
 
     @Slot()
     def run(self) -> None:
         self._running = True
+        self.grid_tracker.reset()
+        self.last_pattern_states = {zone_name: None for zone_name in ZONE_KEYS}
+        self.last_patterns = {zone_name: PATTERN_OFF for zone_name in ZONE_KEYS}
         last_capture_sequence = 0
         last_depth_sequence = -1
         last_scene_frame = -1
         result_count = 0
         zones = empty_stereo_zones((HEIGHT, WIDTH), "Waiting for stereo depth")
+        cells = empty_depth_grid((HEIGHT, WIDTH))
         depth_stale = True
 
         try:
@@ -287,10 +324,7 @@ class StreamWorker(QObject):
             )
 
             self.depth_worker = AsyncDepthProcessor(
-                STEREO_BACKEND,
-                self.calibration,
-                self.maps,
-                self._stereo_update,
+                self.calibration, self.maps, self._stereo_update
             )
             self.depth_worker.start()
 
@@ -355,12 +389,15 @@ class StreamWorker(QObject):
                 if new_depth is not None:
                     self.latest_depth = new_depth
                     last_depth_sequence = new_depth.sequence
-                    zones = compute_stereo_depth_zones(
+                    _, raw_cells = compute_stereo_depth_grid(
                         new_depth.depth_map, new_depth.valid_depth_mask
+                    )
+                    zones, cells = self.grid_tracker.update(
+                        raw_cells, new_depth.depth_map.shape
                     )
                     depth_stale = False
                     result_count += 1
-                    self._apply_patterns(zones, "fresh stereo depth")
+                    self._apply_patterns(zones, "current-frame grid median")
 
                     if (
                         self.inference_worker is not None
@@ -382,9 +419,11 @@ class StreamWorker(QObject):
                     > DEPTH_RESULT_MAX_AGE_MS
                     and not depth_stale
                 ):
+                    self.grid_tracker.reset()
                     zones = empty_stereo_zones(
                         (HEIGHT, WIDTH), "Stereo depth is stale"
                     )
+                    cells = empty_depth_grid((HEIGHT, WIDTH))
                     self._apply_patterns(zones, "stale-depth safety stop")
                     depth_stale = True
 
@@ -408,7 +447,9 @@ class StreamWorker(QObject):
                     if self.latest_depth is not None
                     else current_left
                 )
-                overlay = self.draw_camera_overlay(display_frame, zones, detections)
+                overlay = self.draw_camera_overlay(
+                    display_frame, zones, cells, detections
+                )
                 self.color_ready.emit(self.to_qimage_bgr(overlay))
                 self.zones_ready.emit(zones)
                 if self.latest_depth is not None:
@@ -439,6 +480,7 @@ class StreamWorker(QObject):
             self.error.emit(str(error))
             self._log(f"ERROR: {error}")
         finally:
+            self.grid_tracker.reset()
             try:
                 if self.inference_worker is not None:
                     self.inference_worker.stop()

@@ -1,20 +1,19 @@
 import unittest
 import hashlib
+import inspect
 import json
 import tempfile
 from pathlib import Path
+from unittest.mock import patch
 
 from calibration import load_calibration
-from camera_backend import cv2, np
-from config import (
-    CALIBRATION_PATH,
-    SGBM_BLOCK_SIZE,
-    SGBM_NUM_DISPARITIES,
-    STEREO_BACKEND,
-)
+from camera_backend import np
+from config import CALIBRATION_PATH
+import stereo_depth
 from stereo_depth import (
-    OpenCvStereoEngine,
+    AsyncDepthProcessor,
     calculate_depth,
+    create_vpi_engine,
     load_vpi_runtime_settings,
     make_depth_view,
     vpi_disparity_masks,
@@ -29,13 +28,25 @@ def simple_q() -> np.ndarray:
 
 
 class StereoDepthTests(unittest.TestCase):
-    def test_vpi_is_primary_and_sgbm_remains_tuned_fallback(self):
-        self.assertEqual(STEREO_BACKEND, "vpi-cuda")
-        self.assertEqual(SGBM_BLOCK_SIZE, 11)
-        self.assertEqual(SGBM_NUM_DISPARITIES, 256)
-        engine = OpenCvStereoEngine()
-        self.assertEqual(engine.matcher.getBlockSize(), 11)
-        self.assertEqual(engine.matcher.getNumDisparities(), 256)
+    def test_vpi_cuda_is_the_only_stereo_engine(self):
+        self.assertFalse(hasattr(stereo_depth, "OpenCvStereoEngine"))
+        self.assertEqual(
+            tuple(inspect.signature(AsyncDepthProcessor).parameters),
+            ("calibration", "maps", "status_callback"),
+        )
+        self.assertTrue(callable(create_vpi_engine))
+
+    def test_vpi_initialization_failure_is_fatal_without_cpu_fallback(self):
+        processor = AsyncDepthProcessor(None, None)
+        with patch(
+            "stereo_depth.create_vpi_engine",
+            side_effect=RuntimeError("synthetic VPI failure"),
+        ):
+            with self.assertRaisesRegex(
+                RuntimeError, "synthetic VPI failure"
+            ):
+                processor.start(timeout=1.0)
+        processor.stop()
 
     def test_tuned_vpi_profile_is_calibration_locked(self):
         calibration = load_calibration(CALIBRATION_PATH)
@@ -132,42 +143,6 @@ class StereoDepthTests(unittest.TestCase):
         q[2, 0] = 1.0
         with self.assertRaisesRegex(RuntimeError, "not canonical"):
             calculate_depth(np.ones((2, 2), dtype=np.float32), q)
-
-    def test_saved_one_metre_pair_remains_near_one_metre(self):
-        workspace = Path(__file__).resolve().parents[2]
-        result_dir = (
-            workspace
-            / "1.1_depth_visualization"
-            / "results"
-            / "auto_2026-09-03_23-33-19_088158"
-        )
-        left_path = result_dir / "best_left_rectified.png"
-        right_path = result_dir / "best_right_rectified.png"
-        if not left_path.is_file() or not right_path.is_file():
-            self.skipTest("saved 1 m tuning pair is not present")
-
-        left = cv2.imread(str(left_path))
-        right = cv2.imread(str(right_path))
-        calibration = load_calibration(CALIBRATION_PATH)
-        engine = OpenCvStereoEngine()
-        disparity, confidence = engine.compute(left, right)
-        depth, valid = calculate_depth(
-            disparity,
-            calibration.q_matrix,
-            confidence,
-            engine.minimum_disparity,
-            engine.maximum_disparity,
-        )
-        height, width = depth.shape
-        centre = depth[
-            height // 2 - 36 : height // 2 + 36,
-            width // 2 - 64 : width // 2 + 64,
-        ]
-        samples = centre[np.isfinite(centre)]
-        self.assertGreater(samples.size, 100)
-        self.assertGreater(float(np.median(samples)), 0.90)
-        self.assertLess(float(np.median(samples)), 1.10)
-
 
 if __name__ == "__main__":
     unittest.main()

@@ -17,14 +17,8 @@ CAMERA_FRAME_BUFFER_SIZE = 8
 CAMERA_PAIR_TIMEOUT_SECONDS = 2.0
 MAX_CONSECUTIVE_CAPTURE_FAILURES = 10
 
-# Stereo depth: VPI CUDA is primary. OpenCV SGBM remains the safety fallback;
-# its earlier 1 m tune selected block size 11. Both retain a 256-disparity
-# navigation range for better close-range coverage.
-STEREO_BACKEND = "vpi-cuda"
-ALLOW_OPENCV_STEREO_FALLBACK = True
-SGBM_MIN_DISPARITY = 0
-SGBM_NUM_DISPARITIES = 256
-SGBM_BLOCK_SIZE = 11
+# Stereo depth: the calibrated VPI CUDA profile is the only matcher. A VPI
+# failure is a safety error and never silently changes the depth algorithm.
 
 # Built-in VPI values are used only until Easy Mode creates the JSON profile.
 VPI_MIN_DISPARITY = 0
@@ -40,17 +34,18 @@ VPI_INCLUDE_DIAGONALS = False
 VPI_PROFILE_PATH = PROJECT_ROOT / "vpi_tuned_profile.json"
 DEPTH_RESULT_MAX_AGE_MS = 500.0
 
-# Accepted navigation depth and robust near-surface support.
+# Accepted navigation depth and robust 3x3 median-grid selection.
 MIN_VALID_DEPTH = 0.1
 MAX_VALID_DEPTH = 3.0
-ZONE_SUPPORT_RADIUS = 3
-ZONE_MIN_SUPPORT_PIXELS = 6
-ZONE_MIN_CONNECTED_SURFACE_PIXELS = 24
-ZONE_BORDER_MARGIN_X = 8
-ZONE_BORDER_MARGIN_Y = 8
-ZONE_DEPTH_TOLERANCE_M = 0.06
-ZONE_DEPTH_TOLERANCE_RATIO = 0.10
-ZONE_CANDIDATE_LIMIT = 128
+DEPTH_GRID_ROWS = 3
+DEPTH_GRID_COLUMNS = 3
+GRID_CELL_MIN_VALID_PIXELS = 100
+GRID_CELL_ROI_WIDTH_FRACTION = 0.60
+GRID_CELL_ROI_HEIGHT_FRACTION = 0.60
+ZONE_BORDER_MARGIN_X = 24
+ZONE_BORDER_MARGIN_Y = 24
+GRID_WINNER_CONFIRM_FRAMES = 2
+HAPTIC_DISTANCE_HYSTERESIS_M = 0.08
 
 LOG_EVERY_N_RESULTS = 10
 ZONE_KEYS = ["left", "center", "right"]
@@ -61,7 +56,7 @@ DISPLAY_LABELS = {
 }
 
 # YOLO is informational and never feeds the haptic policy.
-ENABLE_YOLO = True
+ENABLE_YOLO = False
 YOLO_DEVICE = 0
 YOLO_ALLOW_CPU_FALLBACK = True
 YOLO_HALF = True

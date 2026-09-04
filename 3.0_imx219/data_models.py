@@ -13,6 +13,23 @@ class ZoneResult:
     alert_message: str = "No valid depth"
     tone: str = "invalid"
     nearest_point: Optional[Tuple[int, int]] = None
+    source_cell: Optional[str] = None
+
+
+@dataclass
+class GridCellResult:
+    key: str
+    display_name: str
+    row: int
+    column: int
+    rect: Tuple[int, int, int, int]
+    sample_rect: Tuple[int, int, int, int]
+    depth_m: Optional[float] = None
+    valid_count: int = 0
+    total_count: int = 0
+    valid_percentage: float = 0.0
+    representative_point: Optional[Tuple[int, int]] = None
+    selected: bool = False
 
 
 @dataclass(frozen=True)
