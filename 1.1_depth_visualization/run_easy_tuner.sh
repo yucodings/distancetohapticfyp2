@@ -19,10 +19,11 @@ fi
 printf '%s\n' \
   "EASY MODE" \
   "1. Put a textured box or flat object exactly 1.0 metre from the cameras." \
-  "2. Keep it in the centre of both images and keep everything still." \
-  "3. When the windows appear, press A once to tune native VPI CUDA settings." \
-  "4. The best profile is applied automatically to the 3.0 project." \
-  "5. Press Q when finished." \
+  "2. Clear all closer objects from the LEFT, CENTER, and RIGHT thirds." \
+  "3. Keep the target and cameras still." \
+  "4. When the windows appear, press A once; five live pairs are tested." \
+  "5. The best safety-checked profile is applied automatically to 3.0." \
+  "6. Press Q when finished." \
   "Calibration: $CALIBRATION"
 
 exec python3 "$SCRIPT_DIR/stereo_depth_tuner.py" \

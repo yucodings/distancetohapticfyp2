@@ -1,0 +1,43 @@
+{
+  "calibration": {
+    "baseline_m": 0.060291021567817425,
+    "capture_fps": 30,
+    "path": "/home/orin_nano/Desktop/FYP2/1.0_calibration/images/2026-09-04_14-09-56_446423_recalibrated/stereo_calibration.npz",
+    "resolution": [
+      1280,
+      720
+    ],
+    "sensor_mode": 4,
+    "sha256": "8198efd156491578afda3b11a9f2fe9c44d150663e6347676830a14dde4cff2e",
+    "stereo_rms": 0.5358147481454184
+  },
+  "capture": {
+    "host_pair_skew_ms": 21.63457404822111,
+    "sequence": 965
+  },
+  "created_at": "2026-09-04T15:28:08",
+  "measurement": {
+    "error_m": -0.04221552610397339,
+    "known_distance_m": 1.0,
+    "mad_m": 0.007717490196228027,
+    "median_m": 0.9577844738960266,
+    "processing_ms": 154.14937492460012,
+    "roi_size_px": 61,
+    "total_count": 3721,
+    "valid_count": 2933,
+    "valid_percentage": 78.82289707067993,
+    "whole_frame_valid_percentage": 11.91796875
+  },
+  "settings": {
+    "backend": "vpi-cuda",
+    "confidence_threshold": 32768,
+    "disparity_safety_margin_px": 8.0,
+    "include_diagonals": false,
+    "max_disparity": 256,
+    "min_disparity": 0,
+    "p1": 8,
+    "p2": 96,
+    "uniqueness": 0.8,
+    "window_note": "VPI 3 CUDA fixed 9x7 census window; block size ignored"
+  }
+}

@@ -13,7 +13,8 @@ to resolution and sensor mode.
 3. A latest-frame worker computes VPI CUDA disparity, confidence and metric Z
    depth from the saved Q matrix. OpenCV StereoSGBM is the safety fallback.
 4. Valid metric depth is split into left, center, and right zones.
-   Isolated near speckles are rejected before selecting a surface distance.
+   Image borders, isolated near speckles, and connected surfaces smaller than
+   24 pixels are rejected before selecting a surface distance.
 5. Only these stereo zone distances control the SC2/SC3/SC4 actuators.
 6. YOLO runs in an isolated process and is used only for display information.
 
@@ -57,14 +58,23 @@ guessed or overwritten. They must match the exact installed LRA.
 
 - `2.1_testdepthimx219`: the exact OpenCV comparison profile, block size 11 and
   160 disparities.
-- `3.0_imx219`: VPI CUDA with 256 disparities. Run
+- `3.0_imx219`: VPI CUDA with 256 disparities and an 8-pixel upper-limit
+  safety margin. Run
   `../1.1_depth_visualization/run_easy_tuner.sh`, place the target at 1 m, and
   press `A` to produce `vpi_tuned_profile.json` automatically.
-- The VPI profile is accepted only when its calibration SHA-256 matches the
-  calibration used by this application. If the profile is absent, documented
-  built-in VPI defaults are used. If VPI fails, the log reports the reason and
-  the application falls back to the tuned OpenCV SGBM implementation.
+- Only a multi-frame safety-scored schema-2 VPI profile whose calibration
+  SHA-256 matches this application is accepted. Older schema-1 profiles are
+  ignored in favor of safe VPI CUDA defaults; rerun Easy Mode to replace them.
+  If the profile is absent,
+  documented safe VPI defaults are used. If VPI fails, the log reports the
+  reason and the application falls back to tuned OpenCV SGBM.
 
-With this calibration (`fB` about 68 px·m), 256 disparities has a theoretical
-near limit around 0.27 m. Depth configured down to 0.1 m cannot be recovered
-by this stereo matcher; invalid pixels remain black and do not drive haptics.
+The current copied calibration and profile both come from the 2026-09-04
+recalibration/Easy Mode run and share calibration SHA-256 `8198efd...`.
+Actuators remain disabled until live distance checks are complete.
+
+With this calibration (`fB` about 68 px·m), the 248-pixel accepted upper bound
+has a theoretical near limit around 0.27 m. Values closer to the 256-disparity
+search boundary are rejected as artifacts. Depth configured down to 0.1 m
+cannot be recovered by this stereo matcher; invalid pixels remain black and
+do not drive haptics.

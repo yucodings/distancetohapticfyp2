@@ -19,6 +19,7 @@ from config import (
     SGBM_BLOCK_SIZE,
     SGBM_MIN_DISPARITY,
     SGBM_NUM_DISPARITIES,
+    VPI_DISPARITY_SAFETY_MARGIN_PX,
     VPI_INCLUDE_DIAGONALS,
     VPI_INTERNAL_CONFIDENCE_THRESHOLD,
     VPI_MIN_CONFIDENCE,
@@ -44,6 +45,7 @@ class VpiRuntimeSettings:
     p2: int
     uniqueness: float
     include_diagonals: bool
+    disparity_safety_margin_px: float
 
     def validate(self) -> None:
         if not 0 <= self.min_disparity < self.max_disparity <= 256:
@@ -54,6 +56,10 @@ class VpiRuntimeSettings:
             raise ValueError("VPI penalties must satisfy 0 < P1 <= P2 < 256")
         if self.uniqueness != -1.0 and not 0.0 <= self.uniqueness <= 1.0:
             raise ValueError("VPI uniqueness must be -1 or 0..1")
+        if not 0.0 < self.disparity_safety_margin_px < (
+            self.max_disparity - self.min_disparity
+        ):
+            raise ValueError("VPI disparity safety margin must fit inside the range")
 
 
 def default_vpi_settings() -> VpiRuntimeSettings:
@@ -65,6 +71,7 @@ def default_vpi_settings() -> VpiRuntimeSettings:
         p2=VPI_P2,
         uniqueness=VPI_UNIQUENESS,
         include_diagonals=VPI_INCLUDE_DIAGONALS,
+        disparity_safety_margin_px=VPI_DISPARITY_SAFETY_MARGIN_PX,
     )
     settings.validate()
     return settings
@@ -90,8 +97,20 @@ def load_vpi_runtime_settings(
             profile = json.load(stream)
     except (OSError, json.JSONDecodeError) as error:
         raise RuntimeError(f"Could not read VPI profile {profile_path}: {error}") from error
-    if profile.get("schema_version") != 1 or profile.get("backend") != "vpi-cuda":
-        raise RuntimeError(f"Unsupported VPI profile format: {profile_path}")
+    if profile.get("backend") != "vpi-cuda":
+        raise RuntimeError(
+            f"Unsupported VPI profile backend: {profile_path}"
+        )
+    if profile.get("schema_version") == 1:
+        return (
+            default_vpi_settings(),
+            "built-in safe VPI defaults (legacy schema-1 profile ignored)",
+        )
+    if profile.get("schema_version") != 2:
+        raise RuntimeError(
+            f"Unsupported VPI profile format: {profile_path}; "
+            "run the current Easy Mode to create a schema-2 profile"
+        )
     expected_hash = _sha256(calibration.path)
     if profile.get("calibration_sha256") != expected_hash:
         raise RuntimeError(
@@ -108,6 +127,7 @@ def load_vpi_runtime_settings(
         "p2",
         "uniqueness",
         "include_diagonals",
+        "disparity_safety_margin_px",
     }
     missing = sorted(required - raw.keys())
     if missing:
@@ -123,6 +143,7 @@ def load_vpi_runtime_settings(
             p2=int(raw["p2"]),
             uniqueness=float(raw["uniqueness"]),
             include_diagonals=raw["include_diagonals"],
+            disparity_safety_margin_px=float(raw["disparity_safety_margin_px"]),
         )
         settings.validate()
     except (TypeError, ValueError) as error:
@@ -152,6 +173,30 @@ class DepthResult:
     valid_percentage: float
     backend_name: str
     diagnostic_lines: tuple[str, ...]
+
+
+def vpi_disparity_masks(
+    disparity: np.ndarray,
+    min_disparity: float,
+    max_disparity: float,
+    safety_margin_px: float,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Separate usable disparity, near-search-limit values, and sentinels."""
+    if not 0.0 < safety_margin_px < max_disparity - min_disparity:
+        raise ValueError("Disparity safety margin must fit inside the range")
+    finite = np.isfinite(disparity)
+    near_limit = (
+        finite
+        & (disparity >= max_disparity - safety_margin_px)
+        & (disparity < max_disparity)
+    )
+    safe = (
+        finite
+        & (disparity > min_disparity)
+        & (disparity < max_disparity - safety_margin_px)
+    )
+    sentinel = finite & (disparity >= max_disparity)
+    return safe, near_limit, sentinel
 
 
 class OpenCvStereoEngine:
@@ -236,6 +281,7 @@ class VpiCudaStereoEngine:
         self.confidence_u16 = vpi.Image((width, height), vpi.Format.U16)
         self._plausible_percentage = 0.0
         self._confidence_percentage = 0.0
+        self._near_limit_percentage = 0.0
         self._invalid_percentage = 0.0
 
     def warmup(self) -> None:
@@ -275,19 +321,18 @@ class VpiCudaStereoEngine:
         except Exception as error:
             raise RuntimeError(f"VPI CUDA disparity failed: {error}") from error
 
-        plausible = (
-            np.isfinite(disparity)
-            & (disparity > self.minimum_disparity)
-            & (disparity < self.maximum_disparity)
-        )
-        invalid = np.isfinite(disparity) & (
-            disparity >= self.maximum_disparity
+        plausible, near_limit, invalid = vpi_disparity_masks(
+            disparity,
+            self.minimum_disparity,
+            self.maximum_disparity,
+            self.settings.disparity_safety_margin_px,
         )
         confidence_mask = plausible & (
             confidence >= max(1, self.settings.confidence_threshold)
         )
         self._plausible_percentage = 100.0 * float(np.mean(plausible))
         self._confidence_percentage = 100.0 * float(np.mean(confidence_mask))
+        self._near_limit_percentage = 100.0 * float(np.mean(near_limit))
         self._invalid_percentage = 100.0 * float(np.mean(invalid))
         return disparity, confidence_mask
 
@@ -296,6 +341,7 @@ class VpiCudaStereoEngine:
             f"VPI parameters: {self.profile_source}",
             f"VPI plausible disparity: {self._plausible_percentage:.1f}%",
             f"VPI confidence pass: {self._confidence_percentage:.1f}%",
+            f"VPI near-limit rejected: {self._near_limit_percentage:.1f}%",
             f"VPI invalid sentinel: {self._invalid_percentage:.1f}%",
         )
 

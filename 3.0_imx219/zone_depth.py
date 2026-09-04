@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections import deque
 from typing import Dict, Optional
 
 from camera_backend import np
@@ -9,15 +10,47 @@ from config import (
     DISPLAY_LABELS,
     MAX_VALID_DEPTH,
     MIN_VALID_DEPTH,
+    ZONE_BORDER_MARGIN_X,
+    ZONE_BORDER_MARGIN_Y,
     ZONE_CANDIDATE_LIMIT,
     ZONE_DEPTH_TOLERANCE_M,
     ZONE_DEPTH_TOLERANCE_RATIO,
     ZONE_KEYS,
+    ZONE_MIN_CONNECTED_SURFACE_PIXELS,
     ZONE_MIN_SUPPORT_PIXELS,
     ZONE_SUPPORT_RADIUS,
 )
 from data_models import ZoneResult
 from hazard_policy import alert_message, tone_from_depth
+
+
+def _has_connected_surface_support(
+    region: np.ndarray,
+    valid: np.ndarray,
+    start_y: int,
+    start_x: int,
+    candidate_depth: float,
+    tolerance: float,
+) -> bool:
+    """Require a small connected surface, not merely a dense 7x7 speckle."""
+    height, width = region.shape
+    pending = deque([(start_y, start_x)])
+    visited = {start_y * width + start_x}
+    supported = 0
+    while pending:
+        y, x = pending.popleft()
+        if not valid[y, x] or abs(float(region[y, x]) - candidate_depth) > tolerance:
+            continue
+        supported += 1
+        if supported >= ZONE_MIN_CONNECTED_SURFACE_PIXELS:
+            return True
+        for next_y in range(max(0, y - 1), min(height, y + 2)):
+            for next_x in range(max(0, x - 1), min(width, x + 2)):
+                key = next_y * width + next_x
+                if key not in visited:
+                    visited.add(key)
+                    pending.append((next_y, next_x))
+    return False
 
 
 def _nearest_supported_point(
@@ -57,6 +90,15 @@ def _nearest_supported_point(
         )
         if int(np.count_nonzero(support)) < ZONE_MIN_SUPPORT_PIXELS:
             continue
+        if not _has_connected_surface_support(
+            region,
+            valid,
+            int(y),
+            int(x),
+            candidate_depth,
+            tolerance,
+        ):
+            continue
 
         supported_depths = patch_depth[support]
         estimated_depth = float(np.median(supported_depths))
@@ -87,6 +129,10 @@ def compute_stereo_depth_zones(
         & (depth_map > MIN_VALID_DEPTH)
         & (depth_map < MAX_VALID_DEPTH)
     )
+    finite_valid[:ZONE_BORDER_MARGIN_Y, :] = False
+    finite_valid[-ZONE_BORDER_MARGIN_Y:, :] = False
+    finite_valid[:, :ZONE_BORDER_MARGIN_X] = False
+    finite_valid[:, -ZONE_BORDER_MARGIN_X:] = False
     for index, zone_name in enumerate(ZONE_KEYS):
         x1 = width * index // zone_count
         x2 = width * (index + 1) // zone_count

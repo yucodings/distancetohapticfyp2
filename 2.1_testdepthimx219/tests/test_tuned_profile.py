@@ -12,41 +12,42 @@ import test_depth_imx219 as depth_test
 
 
 class TunedProfileTests(unittest.TestCase):
-    def test_default_profile_matches_one_metre_autotune(self):
-        self.assertEqual(depth_test.DEFAULT_STEREO_BACKEND, "opencv")
+    def test_default_profile_matches_latest_vpi_easy_mode(self):
+        self.assertEqual(depth_test.DEFAULT_STEREO_BACKEND, "vpi-cuda")
+        calibration = depth_test.load_calibration(
+            depth_test.DEFAULT_CALIBRATION_PATH
+        )
+        settings, source = depth_test.load_vpi_profile(
+            calibration, depth_test.DEFAULT_VPI_PROFILE_PATH
+        )
+        self.assertEqual(settings.confidence_threshold, 32767)
+        self.assertEqual(settings.p1, 8)
+        self.assertEqual(settings.p2, 96)
+        self.assertEqual(settings.uniqueness, 0.8)
+        self.assertFalse(settings.include_diagonals)
+        self.assertEqual(settings.disparity_safety_margin_px, 8.0)
+        self.assertIn("vpi_tuned_profile.json", source)
+
+    def test_opencv_comparison_profile_is_still_available(self):
         self.assertEqual(depth_test.SGBM_BLOCK_SIZE, 11)
         self.assertEqual(depth_test.SGBM_NUM_DISPARITIES, 160)
         matcher = depth_test.create_stereo_matcher()
         self.assertEqual(matcher.getBlockSize(), 11)
         self.assertEqual(matcher.getNumDisparities(), 160)
 
-    def test_saved_one_metre_pair_remains_near_one_metre(self):
+    def test_latest_saved_vpi_centre_remains_near_one_metre(self):
         result_dir = (
             WORKSPACE_DIR
             / "1.1_depth_visualization"
             / "results"
-            / "auto_2026-09-03_23-33-19_088158"
+            / "vpi_auto_2026-09-04_15-27-41_727249"
         )
-        left_path = result_dir / "best_left_rectified.png"
-        right_path = result_dir / "best_right_rectified.png"
-        if not left_path.is_file() or not right_path.is_file():
+        depth_path = result_dir / "best_depth_metres_float32.npy"
+        valid_path = result_dir / "best_valid_mask.npy"
+        if not depth_path.is_file() or not valid_path.is_file():
             self.skipTest("saved 1 m tuning pair is not present")
-
-        left = depth_test.cv2.imread(str(left_path))
-        right = depth_test.cv2.imread(str(right_path))
-        calibration = depth_test.load_calibration(
-            depth_test.DEFAULT_CALIBRATION_PATH
-        )
-        engine = depth_test.OpenCvStereoEngine()
-        disparity, confidence = engine.compute(left, right)
-        depth, valid = depth_test.calculate_depth(
-            disparity,
-            calibration.q_matrix,
-            depth_test.MAX_DEPTH_M,
-            confidence,
-            engine.minimum_disparity,
-            engine.maximum_disparity,
-        )
+        depth = depth_test.np.load(depth_path)
+        valid = depth_test.np.load(valid_path).astype(bool)
         distance, _, sample_count = depth_test.measure_centre_depth(depth, valid)
         self.assertIsNotNone(distance)
         self.assertGreater(sample_count, 100)

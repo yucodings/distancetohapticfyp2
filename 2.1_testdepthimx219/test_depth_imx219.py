@@ -2,8 +2,8 @@
 """Test live stereo depth from an 8 MP IMX219 binocular camera.
 
 The program captures 1280x720 frames from both CSI sensors, rectifies them
-with the copied calibration NPZ, computes full-resolution disparity with the
-automatically tuned OpenCV SGBM profile, calculates metric Z depth from the
+with the selected calibration NPZ, computes full-resolution disparity with
+the matching VPI CUDA Easy Mode profile, calculates metric Z depth from the
 saved Q matrix, and reports the median distance in a centre region. Full XYZ
 reconstruction is available as an optional diagnostic and PLY export; it uses
 the same disparity and does not replace or improve the stereo matcher.
@@ -19,11 +19,13 @@ Controls:
 from __future__ import annotations
 
 import argparse
+import hashlib
+import json
 import sys
 import threading
 import time
 from collections import deque
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Optional
@@ -54,6 +56,7 @@ from pointcloud_utils import (
 # ---------------------------------------------------------------------------
 SCRIPT_DIR = Path(__file__).resolve().parent
 DEFAULT_CALIBRATION_PATH = SCRIPT_DIR / "stereo_calibration.npz"
+DEFAULT_VPI_PROFILE_PATH = SCRIPT_DIR / "vpi_tuned_profile.json"
 
 LEFT_SENSOR_ID = 0
 RIGHT_SENSOR_ID = 1
@@ -78,17 +81,18 @@ SGBM_BLOCK_SIZE = 11
 # use OpenCV's tuned SGBM block-size result, so its range stays independent.
 VPI_MIN_DISPARITY = 0
 VPI_MAX_DISPARITY = 256
+VPI_DISPARITY_SAFETY_MARGIN_PX = 8.0
 VPI_WINDOW = 5
 
-DEFAULT_STEREO_BACKEND = "opencv"
+DEFAULT_STEREO_BACKEND = "vpi-cuda"
 # Preserve as many VPI disparities as its Python API allows, then apply a
 # configurable confidence filter in Python. VPI 3.2 clamps its CUDA threshold
 # to at least 1, so confidence 0 always means invalid.
 VPI_INTERNAL_CONFIDENCE_THRESHOLD = 1
-VPI_MIN_CONFIDENCE = 8192
-VPI_P1 = 3
-VPI_P2 = 48
-VPI_UNIQUENESS = -1.0
+VPI_MIN_CONFIDENCE = 32767
+VPI_P1 = 8
+VPI_P2 = 96
+VPI_UNIQUENESS = 0.8
 VPI_INCLUDE_DIAGONALS = False
 
 CAMERA_FRAME_BUFFER_SIZE = 8
@@ -127,6 +131,32 @@ class RectificationMaps:
     left_map2: np.ndarray
     right_map1: np.ndarray
     right_map2: np.ndarray
+
+
+@dataclass(frozen=True)
+class VpiRuntimeSettings:
+    min_disparity: int
+    max_disparity: int
+    confidence_threshold: int
+    p1: int
+    p2: int
+    uniqueness: float
+    include_diagonals: bool
+    disparity_safety_margin_px: float
+
+    def validate(self) -> None:
+        if not 0 <= self.min_disparity < self.max_disparity <= 256:
+            raise ValueError("VPI disparity range must satisfy 0 <= min < max <= 256")
+        if not 0 <= self.confidence_threshold <= 65535:
+            raise ValueError("VPI confidence threshold must be 0..65535")
+        if not 0 < self.p1 <= self.p2 < 256:
+            raise ValueError("VPI penalties must satisfy 0 < P1 <= P2 < 256")
+        if not 0.0 <= self.uniqueness <= 1.0:
+            raise ValueError("VPI uniqueness must be enabled between 0 and 1")
+        if not 0.0 < self.disparity_safety_margin_px < (
+            self.max_disparity - self.min_disparity
+        ):
+            raise ValueError("VPI disparity safety margin must fit inside the range")
 
 
 @dataclass(frozen=True)
@@ -176,6 +206,12 @@ def parse_args() -> argparse.Namespace:
         default=DEFAULT_CALIBRATION_PATH,
         help="stereo calibration NPZ (default: copied file beside this script)",
     )
+    parser.add_argument(
+        "--vpi-profile",
+        type=Path,
+        default=DEFAULT_VPI_PROFILE_PATH,
+        help="schema-2 VPI Easy Mode profile matching the calibration",
+    )
     parser.add_argument("--left-id", type=int, default=LEFT_SENSOR_ID)
     parser.add_argument("--right-id", type=int, default=RIGHT_SENSOR_ID)
     parser.add_argument(
@@ -188,7 +224,7 @@ def parse_args() -> argparse.Namespace:
         "--backend",
         choices=("vpi-cuda", "opencv"),
         default=DEFAULT_STEREO_BACKEND,
-        help="stereo engine; OpenCV uses the automatically tuned default",
+        help="stereo engine; VPI uses the matching Easy Mode profile",
     )
     parser.add_argument(
         "--block-size",
@@ -205,10 +241,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--vpi-confidence-threshold",
         type=int,
-        default=VPI_MIN_CONFIDENCE,
+        default=None,
         help=(
-            "minimum accepted VPI U16 confidence, 0-65535; 0 disables the "
-            "additional Python threshold, but VPI confidence 0 stays invalid"
+            "optional override for the profile's VPI confidence, 0-65535"
         ),
     )
     return parser.parse_args()
@@ -289,6 +324,83 @@ def load_calibration(path: Path) -> Calibration:
 
     validate_calibration_settings(calibration)
     return calibration
+
+
+def _sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def default_vpi_settings() -> VpiRuntimeSettings:
+    settings = VpiRuntimeSettings(
+        min_disparity=VPI_MIN_DISPARITY,
+        max_disparity=VPI_MAX_DISPARITY,
+        confidence_threshold=VPI_MIN_CONFIDENCE,
+        p1=VPI_P1,
+        p2=VPI_P2,
+        uniqueness=VPI_UNIQUENESS,
+        include_diagonals=VPI_INCLUDE_DIAGONALS,
+        disparity_safety_margin_px=VPI_DISPARITY_SAFETY_MARGIN_PX,
+    )
+    settings.validate()
+    return settings
+
+
+def load_vpi_profile(
+    calibration: Calibration,
+    profile_path: Path,
+) -> tuple[VpiRuntimeSettings, str]:
+    """Load only a schema-2 Easy Mode profile matching this calibration."""
+    profile_path = profile_path.expanduser().resolve()
+    if not profile_path.is_file():
+        raise FileNotFoundError(f"VPI profile not found: {profile_path}")
+    try:
+        with profile_path.open("r", encoding="utf-8") as stream:
+            profile = json.load(stream)
+    except (OSError, json.JSONDecodeError) as exc:
+        raise RuntimeError(f"Could not read VPI profile '{profile_path}': {exc}") from exc
+    if profile.get("schema_version") != 2 or profile.get("backend") != "vpi-cuda":
+        raise RuntimeError("VPI profile must be a schema-2 vpi-cuda profile")
+    if profile.get("calibration_sha256") != _sha256(calibration.path):
+        raise RuntimeError(
+            "VPI profile does not match the selected calibration; rerun Easy Mode"
+        )
+    raw = profile.get("settings")
+    if not isinstance(raw, dict):
+        raise RuntimeError("VPI profile has no settings object")
+    required = {
+        "min_disparity",
+        "max_disparity",
+        "confidence_threshold",
+        "p1",
+        "p2",
+        "uniqueness",
+        "include_diagonals",
+        "disparity_safety_margin_px",
+    }
+    missing = sorted(required - raw.keys())
+    if missing:
+        raise RuntimeError("VPI profile settings missing: " + ", ".join(missing))
+    if not isinstance(raw["include_diagonals"], bool):
+        raise RuntimeError("VPI include_diagonals must be true or false")
+    try:
+        settings = VpiRuntimeSettings(
+            min_disparity=int(raw["min_disparity"]),
+            max_disparity=int(raw["max_disparity"]),
+            confidence_threshold=int(raw["confidence_threshold"]),
+            p1=int(raw["p1"]),
+            p2=int(raw["p2"]),
+            uniqueness=float(raw["uniqueness"]),
+            include_diagonals=raw["include_diagonals"],
+            disparity_safety_margin_px=float(raw["disparity_safety_margin_px"]),
+        )
+        settings.validate()
+    except (TypeError, ValueError) as exc:
+        raise RuntimeError(f"Invalid VPI profile settings: {exc}") from exc
+    return settings, str(profile_path)
 
 
 def validate_calibration_settings(calibration: Calibration) -> None:
@@ -784,7 +896,14 @@ class VpiCudaStereoEngine:
     name = "NVIDIA VPI CUDA Stereo"
     uses_cuda = True
 
-    def __init__(self, width: int, height: int, min_confidence: int) -> None:
+    def __init__(
+        self,
+        width: int,
+        height: int,
+        settings: VpiRuntimeSettings,
+        profile_source: str,
+    ) -> None:
+        settings.validate()
         try:
             import vpi
         except Exception as exc:
@@ -796,11 +915,13 @@ class VpiCudaStereoEngine:
         self.vpi = vpi
         self.width = width
         self.height = height
-        self.min_confidence = min_confidence
-        self.minimum_disparity = VPI_MIN_DISPARITY
-        self.maximum_disparity = VPI_MAX_DISPARITY
+        self.settings = settings
+        self.profile_source = profile_source
+        self.minimum_disparity = settings.min_disparity
+        self.maximum_disparity = settings.max_disparity
         self.last_positive_percentage = 0.0
         self.last_confidence_percentage = 0.0
+        self.last_near_limit_percentage = 0.0
         self.last_invalid_percentage = 0.0
         self.last_median_disparity = float("nan")
         self.last_median_confidence = float("nan")
@@ -843,15 +964,15 @@ class VpiCudaStereoEngine:
                     out=self.disparity_s16,
                     out_confmap=self.confidence_u16,
                     window=VPI_WINDOW,
-                    maxdisp=VPI_MAX_DISPARITY,
+                    maxdisp=self.settings.max_disparity,
                     # VPI 3.2's Python API clamps this to at least 1.
                     confthreshold=VPI_INTERNAL_CONFIDENCE_THRESHOLD,
                     conftype=self.vpi.ConfidenceType.ABSOLUTE,
-                    mindisp=VPI_MIN_DISPARITY,
-                    p1=VPI_P1,
-                    p2=VPI_P2,
-                    uniqueness=VPI_UNIQUENESS,
-                    includediagonals=VPI_INCLUDE_DIAGONALS,
+                    mindisp=self.settings.min_disparity,
+                    p1=self.settings.p1,
+                    p2=self.settings.p2,
+                    uniqueness=self.settings.uniqueness,
+                    includediagonals=self.settings.include_diagonals,
                 )
 
             # Read locks synchronize the custom VPI stream and make owned
@@ -875,15 +996,29 @@ class VpiCudaStereoEngine:
         plausible = (
             finite
             & (disparity > self.minimum_disparity)
+            & (
+                disparity
+                < self.maximum_disparity
+                - self.settings.disparity_safety_margin_px
+            )
+        )
+        near_limit = (
+            finite
+            & (
+                disparity
+                >= self.maximum_disparity
+                - self.settings.disparity_safety_margin_px
+            )
             & (disparity < self.maximum_disparity)
         )
         invalid_sentinel = finite & (disparity >= self.maximum_disparity)
-        effective_confidence = max(1, self.min_confidence)
+        effective_confidence = max(1, self.settings.confidence_threshold)
         confidence_mask = plausible & (confidence >= effective_confidence)
         self.last_positive_percentage = 100.0 * float(np.mean(plausible))
         self.last_confidence_percentage = 100.0 * float(
             np.mean(confidence_mask)
         )
+        self.last_near_limit_percentage = 100.0 * float(np.mean(near_limit))
         self.last_invalid_percentage = 100.0 * float(
             np.mean(invalid_sentinel)
         )
@@ -916,7 +1051,9 @@ class VpiCudaStereoEngine:
             else "N/A"
         )
         return (
+            f"VPI profile: {Path(self.profile_source).name}",
             f"VPI valid disparity: {self.last_positive_percentage:.1f}%",
+            f"VPI near-limit rejected: {self.last_near_limit_percentage:.1f}%",
             f"VPI invalid sentinel: {self.last_invalid_percentage:.1f}%",
             f"VPI confidence pass: {self.last_confidence_percentage:.1f}%",
             f"Median disp/conf: {median_disparity} / {median_confidence}",
@@ -926,7 +1063,8 @@ class VpiCudaStereoEngine:
 def create_stereo_engine(
     backend: str,
     calibration: Calibration,
-    vpi_confidence_threshold: int,
+    vpi_settings: VpiRuntimeSettings,
+    vpi_profile_source: str,
     sgbm_min_disparity: int = SGBM_MIN_DISPARITY,
     sgbm_num_disparities: int = SGBM_NUM_DISPARITIES,
     sgbm_block_size: int = SGBM_BLOCK_SIZE,
@@ -935,7 +1073,8 @@ def create_stereo_engine(
         return VpiCudaStereoEngine(
             calibration.width,
             calibration.height,
-            vpi_confidence_threshold,
+            vpi_settings,
+            vpi_profile_source,
         )
     if backend == "opencv":
         return OpenCvStereoEngine(
@@ -1120,7 +1259,8 @@ class AsyncDepthProcessor:
         calibration: Calibration,
         maps: RectificationMaps,
         max_depth_m: float,
-        vpi_confidence_threshold: int,
+        vpi_settings: VpiRuntimeSettings,
+        vpi_profile_source: str,
         sgbm_num_disparities: int = SGBM_NUM_DISPARITIES,
         sgbm_block_size: int = SGBM_BLOCK_SIZE,
     ) -> None:
@@ -1128,14 +1268,17 @@ class AsyncDepthProcessor:
         self.calibration = calibration
         self.maps = maps
         self.max_depth_m = max_depth_m
-        self.vpi_confidence_threshold = vpi_confidence_threshold
+        self.vpi_settings = vpi_settings
+        self.vpi_profile_source = vpi_profile_source
         self.sgbm_num_disparities = sgbm_num_disparities
         self.sgbm_block_size = sgbm_block_size
         self.minimum_disparity = (
-            VPI_MIN_DISPARITY if backend == "vpi-cuda" else SGBM_MIN_DISPARITY
+            vpi_settings.min_disparity
+            if backend == "vpi-cuda"
+            else SGBM_MIN_DISPARITY
         )
         self.maximum_disparity = (
-            VPI_MAX_DISPARITY
+            vpi_settings.max_disparity
             if backend == "vpi-cuda"
             else SGBM_MIN_DISPARITY + sgbm_num_disparities
         )
@@ -1214,7 +1357,8 @@ class AsyncDepthProcessor:
             stereo_engine = create_stereo_engine(
                 self.backend,
                 self.calibration,
-                self.vpi_confidence_threshold,
+                self.vpi_settings,
+                self.vpi_profile_source,
                 SGBM_MIN_DISPARITY,
                 self.sgbm_num_disparities,
                 self.sgbm_block_size,
@@ -1449,6 +1593,8 @@ def print_startup(
     vpi_confidence_threshold: int,
     maximum_disparity: int,
     sgbm_block_size: int,
+    vpi_profile_source: str,
+    vpi_safety_margin_px: float,
 ) -> None:
     print("\nIMX219 stereo depth test")
     print(f"  OpenCV version:       {cv2.__version__}")
@@ -1463,11 +1609,13 @@ def print_startup(
     print(f"  Valid depth range:    {MIN_DEPTH_M:.2f} to {max_depth_m:.2f} m")
     print(f"  Stereo backend:       {backend_name}")
     if backend_name == VpiCudaStereoEngine.name:
+        print(f"  VPI profile:          {vpi_profile_source}")
         print(
             "  VPI confidence:       "
             f">= {vpi_confidence_threshold} / 65535 "
             "(VPI internal minimum 1)"
         )
+        print(f"  Disparity margin:     {vpi_safety_margin_px:.1f} px")
     print(f"  Maximum disparity:    {maximum_disparity}")
     if backend_name == OpenCvStereoEngine.name:
         print(f"  Tuned SGBM block:     {sgbm_block_size}")
@@ -1484,7 +1632,9 @@ def print_startup(
 def run(args: argparse.Namespace) -> None:
     if args.max_depth <= MIN_DEPTH_M:
         raise ValueError(f"--max-depth must be greater than {MIN_DEPTH_M}")
-    if not 0 <= args.vpi_confidence_threshold <= 65535:
+    if args.vpi_confidence_threshold is not None and not (
+        0 <= args.vpi_confidence_threshold <= 65535
+    ):
         raise ValueError(
             "--vpi-confidence-threshold must be between 0 and 65535"
         )
@@ -1496,6 +1646,19 @@ def run(args: argparse.Namespace) -> None:
     check_gstreamer()
     calibration = load_calibration(args.calibration)
     rectification_maps = convert_rectification_maps(calibration)
+    vpi_settings = default_vpi_settings()
+    vpi_profile_source = "built-in safe defaults"
+    if args.backend == "vpi-cuda":
+        vpi_settings, vpi_profile_source = load_vpi_profile(
+            calibration, args.vpi_profile
+        )
+        if args.vpi_confidence_threshold is not None:
+            vpi_settings = replace(
+                vpi_settings,
+                confidence_threshold=args.vpi_confidence_threshold,
+            )
+            vpi_settings.validate()
+            vpi_profile_source += " (confidence overridden)"
 
     print(f"Initializing asynchronous stereo backend: {args.backend}...", flush=True)
     depth_worker = AsyncDepthProcessor(
@@ -1503,7 +1666,8 @@ def run(args: argparse.Namespace) -> None:
         calibration,
         rectification_maps,
         args.max_depth,
-        args.vpi_confidence_threshold,
+        vpi_settings,
+        vpi_profile_source,
         args.num_disparities,
         args.block_size,
     )
@@ -1519,9 +1683,11 @@ def run(args: argparse.Namespace) -> None:
             args.right_id,
             args.max_depth,
             depth_worker.backend_name,
-            args.vpi_confidence_threshold,
+            vpi_settings.confidence_threshold,
             depth_worker.maximum_disparity,
             args.block_size,
+            vpi_profile_source,
+            vpi_settings.disparity_safety_margin_px,
         )
         print("Opening IMX219 cameras...", flush=True)
         left_camera, right_camera = open_cameras(

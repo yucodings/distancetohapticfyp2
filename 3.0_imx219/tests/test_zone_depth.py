@@ -1,5 +1,6 @@
 import inspect
 import unittest
+from pathlib import Path
 
 from camera_backend import np
 from data_models import (
@@ -15,10 +16,10 @@ from zone_depth import compute_stereo_depth_zones, empty_stereo_zones
 
 class StereoZoneTests(unittest.TestCase):
     def test_each_zone_selects_nearest_supported_surface(self):
-        depth = np.full((12, 30), np.nan, dtype=np.float32)
-        depth[2:5, 2:5] = 1.8
-        depth[4:7, 13:16] = 0.8
-        depth[6:9, 24:27] = 0.35
+        depth = np.full((60, 150), np.nan, dtype=np.float32)
+        depth[15:21, 15:21] = 1.8
+        depth[22:28, 68:74] = 0.8
+        depth[30:36, 120:126] = 0.35
         valid = np.isfinite(depth)
 
         zones = compute_stereo_depth_zones(depth, valid)
@@ -26,21 +27,62 @@ class StereoZoneTests(unittest.TestCase):
         self.assertAlmostEqual(zones["left"].depth_m, 1.8, places=5)
         self.assertAlmostEqual(zones["center"].depth_m, 0.8, places=5)
         self.assertAlmostEqual(zones["right"].depth_m, 0.35, places=5)
-        self.assertEqual(zones["left"].rect, (0, 0, 10, 12))
-        self.assertEqual(zones["center"].rect, (10, 0, 20, 12))
-        self.assertEqual(zones["right"].rect, (20, 0, 30, 12))
+        self.assertEqual(zones["left"].rect, (0, 0, 50, 60))
+        self.assertEqual(zones["center"].rect, (50, 0, 100, 60))
+        self.assertEqual(zones["right"].rect, (100, 0, 150, 60))
         for zone in zones.values():
             self.assertIsNotNone(zone.nearest_point)
 
     def test_isolated_near_speckle_does_not_override_supported_surface(self):
-        depth = np.full((12, 12), np.nan, dtype=np.float32)
-        depth[1, 1] = 0.2
-        depth[5:8, 2:5] = 1.7
+        depth = np.full((60, 150), np.nan, dtype=np.float32)
+        depth[15, 15] = 0.2
+        depth[25:31, 20:26] = 1.7
         valid = np.isfinite(depth)
 
         zones = compute_stereo_depth_zones(depth, valid)
 
         self.assertAlmostEqual(zones["left"].depth_m, 1.7, places=5)
+
+    def test_small_connected_false_near_cluster_does_not_override_surface(self):
+        depth = np.full((60, 150), np.nan, dtype=np.float32)
+        depth[20:22, 15:22] = 0.3
+        depth[30:36, 25:31] = 1.2
+        valid = np.isfinite(depth)
+
+        zones = compute_stereo_depth_zones(depth, valid)
+
+        self.assertAlmostEqual(zones["left"].depth_m, 1.2, places=5)
+
+    def test_border_surface_is_excluded(self):
+        depth = np.full((60, 150), np.nan, dtype=np.float32)
+        depth[0:6, 20:26] = 0.3
+        depth[25:31, 20:26] = 1.4
+        valid = np.isfinite(depth)
+
+        zones = compute_stereo_depth_zones(depth, valid)
+
+        self.assertAlmostEqual(zones["left"].depth_m, 1.4, places=5)
+
+    def test_latest_vpi_result_has_no_false_continuous_alert(self):
+        result_dir = (
+            Path(__file__).resolve().parents[2]
+            / "1.1_depth_visualization"
+            / "results"
+            / "vpi_auto_2026-09-04_15-27-41_727249"
+        )
+        depth_path = result_dir / "best_depth_metres_float32.npy"
+        valid_path = result_dir / "best_valid_mask.npy"
+        if not depth_path.is_file() or not valid_path.is_file():
+            self.skipTest("latest saved VPI result is not present")
+        depth = np.load(depth_path)
+        valid = np.load(valid_path).astype(bool)
+
+        zones = compute_stereo_depth_zones(depth, valid)
+
+        for result in zones.values():
+            if result.depth_m is not None:
+                self.assertGreaterEqual(result.depth_m, 0.5)
+                self.assertNotEqual(result.tone, "red")
 
     def test_no_supported_depth_means_off(self):
         zones = empty_stereo_zones((6, 9), "stale")

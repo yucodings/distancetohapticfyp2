@@ -9,7 +9,9 @@ from `../3.0_imx219/stereo_calibration.npz` by default.
 ## Easy Mode (recommended)
 
 1. Put a textured box or other flat object exactly **1.0 metre** in front of
-   the cameras. Keep it in the centre and keep everything still.
+   the cameras. Keep it in the centre and keep everything still. Clear away
+   hands, cables, table edges, and other objects closer than the target across
+   the left, centre, and right thirds of the view.
 2. Close the main YOLO/haptic application.
 3. Run one command:
 
@@ -19,8 +21,9 @@ cd /home/orin_nano/Desktop/FYP2/1.1_depth_visualization
 ```
 
 4. When the camera windows appear, press `A` once.
-5. Wait while Easy Mode runs 32 VPI CUDA disparity configurations and scores
-   160 combinations of P1/P2, uniqueness, confidence and diagonal paths.
+5. Wait while Easy Mode captures five separate live stereo pairs, runs 24 VPI
+   CUDA disparity configurations on all five, and scores 96 safe combinations
+   of P1/P2, uniqueness, confidence, and diagonal paths.
 6. It displays the winner, saves evidence under `results/`, and writes the
    validated profile to `../3.0_imx219/vpi_tuned_profile.json`.
 7. Press `Q` to finish.
@@ -29,7 +32,14 @@ The Easy Mode launcher automatically selects the newest completed calibration
 under `../1.0_calibration/images/*/stereo_calibration.npz` and prints the exact
 path before opening the cameras.
 
-The selected profile is loaded automatically by the `3.0` application, but it
+Easy Mode excludes uniqueness-off and confidence `1`, rejects the last eight
+pixels below the 256-disparity search limit, and measures supported false-near
+surfaces independently in every left/centre/right zone. A candidate with more
+than 3% supported false-near pixels in any zone is rejected. Remaining
+false-near and near-limit pixels are penalties, along with target error,
+coverage, temporal noise, and processing time.
+
+The selected schema-2 profile is loaded automatically by the `3.0` application, but it
 must still be checked at 0.5, 1.5, 2.0 and 3.0 metres before enabling actuators.
 The profile contains the calibration SHA-256; `3.0` rejects it if the
 calibration file changes.
@@ -95,7 +105,9 @@ fixed 9x7 census window is used. The SGBM block-size slider therefore cannot
 change VPI output. For VPI, tune confidence, uniqueness, P1/P2, maximum
 disparity and diagonal paths.
 
-Easy Mode fixes VPI `maxDisparity` at 256 for navigation close-range coverage.
+Easy Mode fixes VPI `maxDisparity` at 256 for navigation close-range coverage,
+but disparities from 248 through just below 256 are treated as search-limit
+artifacts and never become valid depth.
 It computes disparity once per P1/P2, uniqueness and diagonal configuration,
 then evaluates several confidence thresholds from the same confidence map.
 The live tuner starts with diagonal paths disabled because the full-resolution
@@ -114,10 +126,13 @@ continue with SGBM.
    in the alignment window lie on the same cyan horizontal guide lines.
 2. Put a textured, flat target at a measured distance. Enter that distance in
    the `Known distance cm` control and click the target center.
-3. Press `A` once and let the VPI CUDA sweep finish without moving the target.
-4. Resume live capture and reject the profile if it has unstable ROI depth,
-   excessive holes, high frame skew or poor processing speed.
-5. Repeat measurements at 0.5, 1.0, 1.5, 2.0 and 3.0 m under representative
+3. Make sure no real object is closer than 0.65 times the known target distance
+   anywhere in the three zones; at a 1 m tune, keep the view clear below 0.65 m.
+4. Press `A` once and let the five-frame VPI CUDA sweep finish without moving
+   the target or cameras.
+5. Reject the profile if the saved report shows unstable ROI depth, excessive
+   holes, high frame skew, false-near surfaces, or poor processing speed.
+6. Repeat measurements at 0.5, 1.0, 1.5, 2.0 and 3.0 m under representative
    lighting before enabling actuators.
 
 Do not choose a preset only because it fills the most pixels. A dense but

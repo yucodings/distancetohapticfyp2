@@ -19,6 +19,9 @@ from tuner_core import (
     SgbmSettings,
     VpiCudaMatcher,
     VpiSettings,
+    VPI_AUTO_DIAGONAL_OPTIONS,
+    VPI_AUTO_PENALTY_PAIRS,
+    VPI_AUTO_UNIQUENESS,
     automatic_tuning_score,
     compute_sgbm,
     convert_rectification_maps,
@@ -32,9 +35,11 @@ from tuner_core import (
     np,
     rectify_pair,
     roi_statistics,
+    safety_tuning_score,
     save_json,
     settings_dict,
     vpi_autotune_candidates,
+    zone_safety_statistics,
 )
 from pointcloud_utils import (
     disparity_to_xyz,
@@ -54,6 +59,7 @@ ALIGNMENT_WINDOW = "Rectification check: LEFT green | RIGHT red"
 AUTO_WINDOW = "Easy Mode automatic tuning"
 POINT_CLOUD_WINDOW = "3D diagnostic: top and front projections"
 PRODUCTION_VPI_PROFILE = SCRIPT_DIR.parent / "3.0_imx219" / "vpi_tuned_profile.json"
+VPI_EASY_FRAME_COUNT = 5
 
 
 @dataclass(frozen=True)
@@ -198,6 +204,25 @@ class StereoCapture:
             thread.join(timeout=2.0)
         for camera in self.cameras.values():
             camera.release()
+
+
+def collect_live_tuning_pairs(
+    capture: StereoCapture,
+    count: int = VPI_EASY_FRAME_COUNT,
+) -> list[CapturedPair]:
+    if count < 3:
+        raise ValueError("VPI safety tuning requires at least three live frames")
+    pairs: list[CapturedPair] = []
+    while len(pairs) < count:
+        candidate = capture.get()
+        if not pairs or candidate.sequence != pairs[-1].sequence:
+            pairs.append(candidate)
+            print(
+                f"Collected live tuning frame {len(pairs)}/{count} "
+                f"(skew {candidate.skew_ms:.2f} ms)",
+                flush=True,
+            )
+    return pairs
 
 
 def check_gstreamer() -> None:
@@ -493,7 +518,7 @@ def show_vpi_auto_progress(
         f"confidence threshold={settings.confidence_threshold}",
         "candidate rejected" if score is None else f"candidate score: {score:.5f}",
         "no valid candidate yet" if best_score is None else f"best score: {best_score:.5f}",
-        "The frozen stereo pair remains unchanged.",
+        f"Scoring {VPI_EASY_FRAME_COUNT} separately captured live stereo pairs.",
     ]
     for index, line in enumerate(lines):
         cv2.putText(
@@ -689,7 +714,7 @@ def run_easy_autotune(
 def run_vpi_easy_autotune(
     calibration,
     maps,
-    pair: CapturedPair,
+    pairs: list[CapturedPair],
     center: tuple[int, int],
     roi_size: int,
     known_distance_m: float,
@@ -697,25 +722,28 @@ def run_vpi_easy_autotune(
     display_progress: bool = True,
     production_profile_path: Optional[Path] = PRODUCTION_VPI_PROFILE,
 ):
-    """Tune only parameters implemented by VPI's CUDA stereo backend."""
-    left_rectified, right_rectified = rectify_pair(
-        pair.left, pair.right, calibration, maps
-    )
+    """Tune native VPI controls across several live safety-check frames."""
+    if len(pairs) < 3:
+        raise ValueError("VPI Easy Mode requires at least three live stereo pairs")
+    rectified_pairs = [
+        (pair, *rectify_pair(pair.left, pair.right, calibration, maps))
+        for pair in pairs
+    ]
     candidates = vpi_autotune_candidates(max_disparity=256)
     total = len(candidates)
     records: list[dict] = []
-    best: Optional[tuple[float, VpiSettings, tuple]] = None
+    best: Optional[tuple[float, VpiSettings, object]] = None
     completed = 0
 
     if display_progress:
         cv2.namedWindow(AUTO_WINDOW, cv2.WINDOW_NORMAL)
         cv2.resizeWindow(AUTO_WINDOW, 960, 300)
 
-    for diagonals in (True, False):
+    for diagonals in VPI_AUTO_DIAGONAL_OPTIONS:
         matcher: Optional[VpiCudaMatcher] = None
         payload_error: Optional[str] = None
-        for p1, p2 in ((1, 32), (3, 48), (5, 64), (8, 96)):
-            for uniqueness in (-1.0, 0.80, 0.90, 0.95):
+        for p1, p2 in VPI_AUTO_PENALTY_PAIRS:
+            for uniqueness in VPI_AUTO_UNIQUENESS:
                 base = VpiSettings(
                     min_disparity=0,
                     max_disparity=256,
@@ -731,24 +759,36 @@ def run_vpi_easy_autotune(
                             calibration.width, calibration.height, base
                         )
                         # Exclude one-time VPI payload creation from candidate timing.
-                        matcher.compute(left_rectified, right_rectified, base)
+                        matcher.compute(
+                            rectified_pairs[0][1], rectified_pairs[0][2], base
+                        )
                     except Exception as error:
                         payload_error = str(error)
                         matcher = None
+                frame_payloads: list[tuple] = []
                 try:
                     if payload_error is not None:
                         raise RuntimeError(payload_error)
                     assert matcher is not None
-                    started = time.monotonic()
-                    disparity, plausible, confidence = matcher.compute(
-                        left_rectified, right_rectified, base
-                    )
-                    elapsed_ms = (time.monotonic() - started) * 1000.0
+                    for captured, left_rectified, right_rectified in rectified_pairs:
+                        started = time.monotonic()
+                        disparity, plausible, confidence = matcher.compute(
+                            left_rectified, right_rectified, base
+                        )
+                        elapsed_ms = (time.monotonic() - started) * 1000.0
+                        frame_payloads.append(
+                            (
+                                captured,
+                                disparity,
+                                plausible,
+                                confidence,
+                                elapsed_ms,
+                            )
+                        )
                     compute_error = None
                 except Exception as error:
-                    disparity = plausible = confidence = None
-                    elapsed_ms = float("nan")
                     compute_error = str(error)
+                    frame_payloads = []
 
                 group_best: Optional[tuple[float, int]] = None
                 for candidate in (
@@ -762,8 +802,7 @@ def run_vpi_easy_autotune(
                     completed += 1
                     if compute_error is not None:
                         score = None
-                        statistics = None
-                        whole_valid = 0.0
+                        evaluation = None
                         records.append(
                             {
                                 "settings": settings_dict("vpi-cuda", candidate),
@@ -772,54 +811,78 @@ def run_vpi_easy_autotune(
                             }
                         )
                     else:
-                        assert disparity is not None
-                        assert plausible is not None
-                        assert confidence is not None
-                        disparity_valid = plausible & (
-                            confidence >= candidate.confidence_threshold
-                        )
-                        depth, valid = depth_from_disparity(
-                            disparity, calibration.q_matrix, disparity_valid
-                        )
-                        statistics = roi_statistics(
-                            depth,
-                            valid,
-                            center,
-                            roi_size,
-                            known_distance_m,
-                        )
-                        whole_valid = 100.0 * float(np.mean(valid))
-                        score = automatic_tuning_score(
-                            statistics,
-                            whole_valid,
+                        roi_frames = []
+                        zone_frames = []
+                        frame_valid_percentages = []
+                        processing_times_ms = []
+                        for (
+                            _captured,
+                            disparity,
+                            plausible,
+                            confidence,
                             elapsed_ms,
+                        ) in frame_payloads:
+                            confidence_mask = confidence >= (
+                                candidate.confidence_threshold
+                            )
+                            disparity_valid = plausible & confidence_mask
+                            depth, valid = depth_from_disparity(
+                                disparity,
+                                calibration.q_matrix,
+                                disparity_valid,
+                            )
+                            roi_frames.append(
+                                roi_statistics(
+                                    depth,
+                                    valid,
+                                    center,
+                                    roi_size,
+                                    known_distance_m,
+                                )
+                            )
+                            zone_frames.append(
+                                zone_safety_statistics(
+                                    depth,
+                                    valid,
+                                    disparity,
+                                    confidence_mask,
+                                    candidate.max_disparity,
+                                    candidate.disparity_safety_margin_px,
+                                    known_distance_m,
+                                )
+                            )
+                            frame_valid_percentages.append(
+                                100.0 * float(np.mean(valid))
+                            )
+                            processing_times_ms.append(elapsed_ms)
+                        evaluation = safety_tuning_score(
+                            roi_frames,
+                            zone_frames,
+                            frame_valid_percentages,
+                            processing_times_ms,
                             known_distance_m,
                         )
+                        score = evaluation.score
                         if score is not None:
                             if group_best is None or score < group_best[0]:
                                 group_best = (score, candidate.confidence_threshold)
                             if best is None or score < best[0]:
-                                best = (
-                                    score,
-                                    candidate,
-                                    (
-                                        disparity,
-                                        depth,
-                                        valid,
-                                        disparity_valid,
-                                        confidence,
-                                        elapsed_ms,
-                                        statistics,
-                                        whole_valid,
-                                    ),
-                                )
+                                best = (score, candidate, evaluation)
                         records.append(
                             {
                                 "settings": settings_dict("vpi-cuda", candidate),
                                 "score": score,
-                                "processing_ms": elapsed_ms,
-                                "whole_frame_valid_percentage": whole_valid,
-                                "roi": asdict(statistics),
+                                "rejection_reason": evaluation.rejection_reason,
+                                "processing_ms_mean": float(
+                                    np.mean(processing_times_ms)
+                                ),
+                                "frame_count": len(frame_payloads),
+                                "roi": asdict(evaluation.aggregate_roi),
+                                "safety": asdict(evaluation),
+                                "zone_frames": [
+                                    [asdict(zone) for zone in frame]
+                                    for frame in zone_frames
+                                ],
                             }
                         )
                     best_score = None if best is None else best[0]
@@ -848,20 +911,99 @@ def run_vpi_easy_autotune(
         if display_progress:
             cv2.destroyWindow(AUTO_WINDOW)
         errors = [record.get("error") for record in records if record.get("error")]
-        detail = errors[0] if errors else "fewer than 20% valid target pixels"
+        rejections = [
+            record.get("rejection_reason")
+            for record in records
+            if record.get("rejection_reason")
+        ]
+        detail = (
+            errors[0]
+            if errors
+            else (
+                rejections[0]
+                if rejections
+                else "insufficient stable target coverage"
+            )
+        )
         raise RuntimeError(f"VPI Easy Mode found no valid candidate: {detail}")
 
-    best_score, best_settings, best_payload = best
-    (
-        disparity,
-        depth,
-        valid,
-        disparity_valid,
-        confidence,
-        elapsed_ms,
-        statistics,
-        whole_valid,
-    ) = best_payload
+    best_score, best_settings, _sweep_evaluation = best
+    stamp = datetime.now().strftime("vpi_auto_%Y-%m-%d_%H-%M-%S_%f")
+    output = output_root / stamp
+    validation_output = output / "validation_frames"
+    validation_output.mkdir(parents=True, exist_ok=False)
+
+    best_matcher = VpiCudaMatcher(
+        calibration.width, calibration.height, best_settings
+    )
+    best_matcher.compute(
+        rectified_pairs[0][1], rectified_pairs[0][2], best_settings
+    )
+    roi_frames = []
+    zone_frames = []
+    frame_valid_percentages = []
+    processing_times_ms = []
+    final_frame_records = []
+    for frame_index, (captured, left_rectified, right_rectified) in enumerate(
+        rectified_pairs, start=1
+    ):
+        started = time.monotonic()
+        disparity, plausible, confidence = best_matcher.compute(
+            left_rectified, right_rectified, best_settings
+        )
+        elapsed_ms = (time.monotonic() - started) * 1000.0
+        confidence_mask = confidence >= best_settings.confidence_threshold
+        disparity_valid = plausible & confidence_mask
+        depth, valid = depth_from_disparity(
+            disparity, calibration.q_matrix, disparity_valid
+        )
+        statistics = roi_statistics(
+            depth, valid, center, roi_size, known_distance_m
+        )
+        zones = zone_safety_statistics(
+            depth,
+            valid,
+            disparity,
+            confidence_mask,
+            best_settings.max_disparity,
+            best_settings.disparity_safety_margin_px,
+            known_distance_m,
+        )
+        whole_valid = 100.0 * float(np.mean(valid))
+        roi_frames.append(statistics)
+        zone_frames.append(zones)
+        frame_valid_percentages.append(whole_valid)
+        processing_times_ms.append(elapsed_ms)
+        final_frame_records.append(
+            {
+                "sequence": captured.sequence,
+                "host_pair_skew_ms": captured.skew_ms,
+                "processing_ms": elapsed_ms,
+                "whole_frame_valid_percentage": whole_valid,
+                "roi": asdict(statistics),
+                "zones": [asdict(zone) for zone in zones],
+            }
+        )
+        prefix = validation_output / f"frame_{frame_index:02d}"
+        cv2.imwrite(str(prefix.with_name(prefix.name + "_left.png")), left_rectified)
+        cv2.imwrite(
+            str(prefix.with_name(prefix.name + "_depth.png")),
+            make_depth_view(depth, valid),
+        )
+
+    final_evaluation = safety_tuning_score(
+        roi_frames,
+        zone_frames,
+        frame_valid_percentages,
+        processing_times_ms,
+        known_distance_m,
+    )
+    if final_evaluation.score is None:
+        raise RuntimeError(
+            "Best VPI candidate failed final multi-frame safety verification: "
+            + str(final_evaluation.rejection_reason)
+        )
+    best_score = final_evaluation.score
     disparity_view = make_disparity_view(
         disparity,
         disparity_valid,
@@ -871,9 +1013,6 @@ def run_vpi_easy_autotune(
     depth_view = make_depth_view(depth, valid)
     alignment = make_alignment_overlay(left_rectified, right_rectified)
 
-    stamp = datetime.now().strftime("vpi_auto_%Y-%m-%d_%H-%M-%S_%f")
-    output = output_root / stamp
-    output.mkdir(parents=True, exist_ok=False)
     cv2.imwrite(str(output / "best_left_rectified.png"), left_rectified)
     cv2.imwrite(str(output / "best_right_rectified.png"), right_rectified)
     cv2.imwrite(str(output / "best_disparity_heatmap.png"), disparity_view)
@@ -895,7 +1034,7 @@ def run_vpi_easy_autotune(
         key=lambda item: float("inf") if item.get("score") is None else item["score"],
     )
     profile = {
-        "schema_version": 1,
+        "schema_version": 2,
         "backend": "vpi-cuda",
         "calibration_sha256": calibration.sha256,
         "known_distance_m": known_distance_m,
@@ -904,7 +1043,7 @@ def run_vpi_easy_autotune(
     }
     report = {
         "created_at": datetime.now().isoformat(timespec="seconds"),
-        "method": "Measured flat-target VPI CUDA native-parameter sweep",
+        "method": "Multi-frame safety-scored VPI CUDA native-parameter sweep",
         "window_note": "VPI 3 CUDA uses a fixed 9x7 census window.",
         "warning": "Verify the profile live at every navigation threshold.",
         "calibration": {
@@ -913,16 +1052,28 @@ def run_vpi_easy_autotune(
             "resolution": [calibration.width, calibration.height],
             "baseline_m": calibration.baseline_m,
         },
-        "capture": {"sequence": pair.sequence, "host_pair_skew_ms": pair.skew_ms},
+        "captures": final_frame_records,
         "known_distance_m": known_distance_m,
         "roi_center": list(center),
         "roi_size_px": roi_size,
         "best": {
             "score": best_score,
             "settings": settings_dict("vpi-cuda", best_settings),
-            "roi": asdict(statistics),
-            "processing_ms": elapsed_ms,
-            "whole_frame_valid_percentage": whole_valid,
+            "roi": asdict(final_evaluation.aggregate_roi),
+            "temporal_roi_mad_m": final_evaluation.temporal_roi_mad_m,
+            "processing_ms_mean": float(np.mean(processing_times_ms)),
+            "whole_frame_valid_percentage_mean": (
+                final_evaluation.mean_frame_valid_percentage
+            ),
+            "mean_supported_near_percentage": (
+                final_evaluation.mean_supported_near_percentage
+            ),
+            "worst_supported_near_percentage": (
+                final_evaluation.worst_supported_near_percentage
+            ),
+            "mean_near_limit_percentage": (
+                final_evaluation.mean_near_limit_percentage
+            ),
         },
         "ranked_candidates": ranked,
     }
@@ -937,7 +1088,7 @@ def run_vpi_easy_autotune(
         cv2.waitKey(250)
         cv2.destroyWindow(AUTO_WINDOW)
     computed = (
-        pair,
+        pairs[-1],
         "vpi-cuda",
         best_settings,
         left_rectified,
@@ -1286,16 +1437,27 @@ def main() -> int:
                     )
                     print(status_message)
                 else:
-                    frozen = True
                     vpi_matcher = None
                     gc.collect()
                     try:
                         if backend == "vpi-cuda":
+                            if capture is None:
+                                raise RuntimeError(
+                                    "VPI Easy Mode requires live cameras; offline images "
+                                    "cannot measure temporal stability"
+                                )
+                            status_message = (
+                                f"Collecting {VPI_EASY_FRAME_COUNT} live stereo pairs"
+                            )
+                            print(status_message)
+                            tuning_pairs = collect_live_tuning_pairs(capture)
+                            pair = tuning_pairs[-1]
+                            frozen = True
                             best_settings, computed, output, best_score = (
                                 run_vpi_easy_autotune(
                                     calibration,
                                     maps,
-                                    pair,
+                                    tuning_pairs,
                                     tuple(inspection),
                                     roi_size,
                                     known_distance,
@@ -1310,6 +1472,7 @@ def main() -> int:
                             )
                             selected_backend = "vpi-cuda"
                         else:
+                            frozen = True
                             best_settings, computed, output, best_score = (
                                 run_easy_autotune(
                                     calibration,

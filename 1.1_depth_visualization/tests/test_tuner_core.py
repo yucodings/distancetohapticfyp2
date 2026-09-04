@@ -11,6 +11,7 @@ if str(PROJECT_DIR) not in sys.path:
     sys.path.insert(0, str(PROJECT_DIR))
 
 from tuner_core import (
+    RoiStatistics,
     SgbmSettings,
     VpiSettings,
     automatic_tuning_score,
@@ -22,8 +23,11 @@ from tuner_core import (
     make_alignment_overlay,
     np,
     roi_statistics,
+    safety_tuning_score,
     settings_dict,
     vpi_autotune_candidates,
+    vpi_disparity_masks,
+    zone_safety_statistics,
 )
 
 
@@ -53,6 +57,8 @@ class SettingsTests(unittest.TestCase):
             VpiSettings(max_disparity=257).validate()
         with self.assertRaises(ValueError):
             VpiSettings(p1=49, p2=48).validate()
+        with self.assertRaises(ValueError):
+            VpiSettings(disparity_safety_margin_px=256).validate()
 
     def test_vpi_preset_explains_fixed_window(self):
         saved = settings_dict("vpi-cuda", VpiSettings())
@@ -60,23 +66,38 @@ class SettingsTests(unittest.TestCase):
 
     def test_vpi_autotune_sweeps_every_native_quality_control(self):
         candidates = vpi_autotune_candidates()
-        self.assertEqual(len(candidates), 160)
+        self.assertEqual(len(candidates), 96)
         self.assertEqual({item.p1 for item in candidates}, {1, 3, 5, 8})
         self.assertEqual({item.p2 for item in candidates}, {32, 48, 64, 96})
         self.assertEqual(
-            {item.uniqueness for item in candidates}, {-1.0, 0.8, 0.9, 0.95}
+            {item.uniqueness for item in candidates}, {0.8, 0.9, 0.95}
         )
         self.assertEqual(
             {item.confidence_threshold for item in candidates},
-            {1, 4096, 8192, 16384, 32767},
+            {4096, 8192, 16384, 32767},
         )
         self.assertEqual(
             {item.include_diagonals for item in candidates}, {False, True}
         )
         self.assertEqual({item.max_disparity for item in candidates}, {256})
+        self.assertEqual(
+            {item.disparity_safety_margin_px for item in candidates}, {8.0}
+        )
 
 
 class GeometryTests(unittest.TestCase):
+    def test_vpi_disparity_margin_rejects_values_near_256(self):
+        disparity = np.array(
+            [[247.0, 248.0, 255.96875, 256.0, np.inf]], dtype=np.float32
+        )
+        safe, near_limit = vpi_disparity_masks(disparity, 0.0, 256.0, 8.0)
+        np.testing.assert_array_equal(
+            safe, [[True, False, False, False, False]]
+        )
+        np.testing.assert_array_equal(
+            near_limit, [[False, True, True, False, False]]
+        )
+
     def test_expected_disparity(self):
         q = simple_q()
         self.assertAlmostEqual(expected_disparity(q, 0.5), 20.0)
@@ -137,6 +158,58 @@ class GeometryTests(unittest.TestCase):
             known_distance_m=1.0,
         )
         self.assertIsNone(automatic_tuning_score(sparse, 10.0, 50.0, 1.0))
+
+    def test_zone_safety_detects_supported_false_near_surface_in_each_third(self):
+        depth = np.ones((30, 90), dtype=np.float32)
+        valid = np.ones_like(depth, dtype=bool)
+        disparity = np.full_like(depth, 10.0)
+        confidence = np.ones_like(valid)
+        for zone_index in range(3):
+            x1 = zone_index * 30 + 8
+            depth[8:18, x1 : x1 + 10] = 0.4
+        zones = zone_safety_statistics(
+            depth, valid, disparity, confidence, 256.0, 8.0, 1.0
+        )
+        self.assertEqual([zone.zone for zone in zones], ["left", "center", "right"])
+        for zone in zones:
+            self.assertGreater(zone.supported_unexpected_near_percentage, 3.0)
+            self.assertAlmostEqual(zone.nearest_supported_m, 0.4)
+
+    def test_multiframe_safety_score_penalizes_temporal_noise_and_rejects_near(self):
+        def roi(median: float) -> RoiStatistics:
+            return RoiStatistics(100, 100, 100.0, median, 0.01, median - 1.0)
+
+        depth = np.ones((30, 90), dtype=np.float32)
+        valid = np.ones_like(depth, dtype=bool)
+        disparity = np.full_like(depth, 10.0)
+        confidence = np.ones_like(valid)
+        clean_zones = zone_safety_statistics(
+            depth, valid, disparity, confidence, 256.0, 8.0, 1.0
+        )
+        stable = safety_tuning_score(
+            [roi(1.0)] * 5, [clean_zones] * 5, [80.0] * 5, [50.0] * 5, 1.0
+        )
+        noisy = safety_tuning_score(
+            [roi(value) for value in (0.8, 0.9, 1.0, 1.1, 1.2)],
+            [clean_zones] * 5,
+            [80.0] * 5,
+            [50.0] * 5,
+            1.0,
+        )
+        self.assertIsNotNone(stable.score)
+        self.assertIsNotNone(noisy.score)
+        self.assertLess(stable.score, noisy.score)
+
+        unsafe_depth = depth.copy()
+        unsafe_depth[5:20, 5:20] = 0.3
+        unsafe_zones = zone_safety_statistics(
+            unsafe_depth, valid, disparity, confidence, 256.0, 8.0, 1.0
+        )
+        unsafe = safety_tuning_score(
+            [roi(1.0)] * 5, [unsafe_zones] * 5, [80.0] * 5, [50.0] * 5, 1.0
+        )
+        self.assertIsNone(unsafe.score)
+        self.assertIn("unexpected-near", unsafe.rejection_reason)
 
 
 class MatcherTests(unittest.TestCase):

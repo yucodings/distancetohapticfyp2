@@ -90,6 +90,7 @@ class VpiSettings:
     p2: int = 48
     uniqueness: float = -1.0
     include_diagonals: bool = False
+    disparity_safety_margin_px: float = 8.0
 
     def validate(self) -> None:
         if not 0 <= self.min_disparity < self.max_disparity <= 256:
@@ -100,14 +101,21 @@ class VpiSettings:
             raise ValueError("VPI requires 0 < P1 <= P2 < 256")
         if self.uniqueness != -1.0 and not 0.0 <= self.uniqueness <= 1.0:
             raise ValueError("VPI uniqueness must be -1 (off) or 0..1")
+        if not 0.0 < self.disparity_safety_margin_px < (
+            self.max_disparity - self.min_disparity
+        ):
+            raise ValueError("VPI disparity safety margin must fit inside the range")
 
 
 # VPI CUDA fixes its census window at 9x7. These are the native controls that
 # Easy Mode can genuinely tune without pretending that SGBM block size applies.
 VPI_AUTO_PENALTY_PAIRS = ((1, 32), (3, 48), (5, 64), (8, 96))
-VPI_AUTO_UNIQUENESS = (-1.0, 0.80, 0.90, 0.95)
-VPI_AUTO_CONFIDENCE_THRESHOLDS = (1, 4096, 8192, 16384, 32767)
-VPI_AUTO_DIAGONAL_OPTIONS = (True, False)
+VPI_AUTO_UNIQUENESS = (0.80, 0.90, 0.95)
+VPI_AUTO_CONFIDENCE_THRESHOLDS = (4096, 8192, 16384, 32767)
+VPI_AUTO_DIAGONAL_OPTIONS = (False, True)
+VPI_DISPARITY_SAFETY_MARGIN_PX = 8.0
+UNEXPECTED_NEAR_DISTANCE_RATIO = 0.65
+MAX_SUPPORTED_NEAR_ZONE_PERCENT = 3.0
 
 
 def vpi_autotune_candidates(max_disparity: int = 256) -> tuple[VpiSettings, ...]:
@@ -121,6 +129,7 @@ def vpi_autotune_candidates(max_disparity: int = 256) -> tuple[VpiSettings, ...]
             p2=p2,
             uniqueness=uniqueness,
             include_diagonals=diagonals,
+            disparity_safety_margin_px=VPI_DISPARITY_SAFETY_MARGIN_PX,
         )
         for diagonals in VPI_AUTO_DIAGONAL_OPTIONS
         for p1, p2 in VPI_AUTO_PENALTY_PAIRS
@@ -140,6 +149,27 @@ class RoiStatistics:
     median_m: Optional[float]
     mad_m: Optional[float]
     error_m: Optional[float]
+
+
+@dataclass(frozen=True)
+class ZoneSafetyStatistics:
+    zone: str
+    valid_percentage: float
+    supported_unexpected_near_percentage: float
+    near_limit_percentage: float
+    nearest_supported_m: Optional[float]
+
+
+@dataclass(frozen=True)
+class SafetyTuningEvaluation:
+    score: Optional[float]
+    rejection_reason: Optional[str]
+    aggregate_roi: RoiStatistics
+    temporal_roi_mad_m: Optional[float]
+    mean_frame_valid_percentage: float
+    mean_supported_near_percentage: float
+    worst_supported_near_percentage: float
+    mean_near_limit_percentage: float
 
 
 def automatic_tuning_score(
@@ -173,6 +203,183 @@ def automatic_tuning_score(
         + 0.30 * roi_missing
         + 0.05 * frame_missing
         + 0.03 * seconds
+    )
+
+
+def vpi_disparity_masks(
+    disparity: np.ndarray,
+    min_disparity: float,
+    max_disparity: float,
+    safety_margin_px: float = VPI_DISPARITY_SAFETY_MARGIN_PX,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Return safe disparities and values too close to the search limit."""
+    if not 0.0 < safety_margin_px < max_disparity - min_disparity:
+        raise ValueError("Disparity safety margin must fit inside the range")
+    finite = np.isfinite(disparity)
+    near_limit = (
+        finite
+        & (disparity >= max_disparity - safety_margin_px)
+        & (disparity < max_disparity)
+    )
+    safe = (
+        finite
+        & (disparity > min_disparity)
+        & (disparity < max_disparity - safety_margin_px)
+    )
+    return safe, near_limit
+
+
+def zone_safety_statistics(
+    depth: np.ndarray,
+    valid: np.ndarray,
+    disparity: np.ndarray,
+    confidence_mask: np.ndarray,
+    max_disparity: float,
+    safety_margin_px: float,
+    known_distance_m: float,
+    support_radius: int = 3,
+    min_support_pixels: int = 6,
+) -> tuple[ZoneSafetyStatistics, ...]:
+    """Measure supported unexpectedly-near and near-limit pixels per third."""
+    if depth.shape != valid.shape or depth.shape != disparity.shape:
+        raise ValueError("Depth, valid and disparity arrays must have the same shape")
+    if confidence_mask.shape != depth.shape:
+        raise ValueError("Confidence mask shape does not match depth")
+    if known_distance_m <= 0:
+        raise ValueError("Known distance must be positive")
+    if support_radius < 0 or min_support_pixels < 1:
+        raise ValueError("Invalid near-surface support settings")
+
+    _, near_limit = vpi_disparity_masks(
+        disparity, 0.0, max_disparity, safety_margin_px
+    )
+    unexpected_near_limit = max(
+        MIN_DEPTH_M, known_distance_m * UNEXPECTED_NEAR_DISTANCE_RATIO
+    )
+    height, width = depth.shape
+    results: list[ZoneSafetyStatistics] = []
+    for index, zone in enumerate(("left", "center", "right")):
+        x1 = width * index // 3
+        x2 = width * (index + 1) // 3
+        zone_valid = valid[:, x1:x2]
+        zone_depth = depth[:, x1:x2]
+        near = (
+            zone_valid
+            & np.isfinite(zone_depth)
+            & (zone_depth < unexpected_near_limit)
+        )
+        kernel = 2 * support_radius + 1
+        support_count = cv2.boxFilter(
+            near.astype(np.uint8),
+            cv2.CV_16U,
+            (kernel, kernel),
+            normalize=False,
+            borderType=cv2.BORDER_CONSTANT,
+        )
+        supported = near & (support_count >= min_support_pixels)
+        supported_depths = zone_depth[supported]
+        zone_pixels = max(1, height * (x2 - x1))
+        zone_near_limit = near_limit[:, x1:x2] & confidence_mask[:, x1:x2]
+        results.append(
+            ZoneSafetyStatistics(
+                zone=zone,
+                valid_percentage=100.0 * float(np.count_nonzero(zone_valid)) / zone_pixels,
+                supported_unexpected_near_percentage=(
+                    100.0 * float(np.count_nonzero(supported)) / zone_pixels
+                ),
+                near_limit_percentage=(
+                    100.0 * float(np.count_nonzero(zone_near_limit)) / zone_pixels
+                ),
+                nearest_supported_m=(
+                    None
+                    if supported_depths.size == 0
+                    else float(np.min(supported_depths))
+                ),
+            )
+        )
+    return tuple(results)
+
+
+def safety_tuning_score(
+    roi_frames: list[RoiStatistics],
+    zone_frames: list[tuple[ZoneSafetyStatistics, ...]],
+    frame_valid_percentages: list[float],
+    processing_times_ms: list[float],
+    known_distance_m: float,
+    minimum_frames: int = 3,
+) -> SafetyTuningEvaluation:
+    """Score target accuracy, temporal stability and three-zone safety."""
+    if len(roi_frames) < minimum_frames:
+        raise ValueError(f"Safety tuning requires at least {minimum_frames} frames")
+    if not (
+        len(roi_frames)
+        == len(zone_frames)
+        == len(frame_valid_percentages)
+        == len(processing_times_ms)
+    ):
+        raise ValueError("Multi-frame tuning inputs have different lengths")
+    medians = [item.median_m for item in roi_frames if item.median_m is not None]
+    mads = [item.mad_m for item in roi_frames if item.mad_m is not None]
+    valid_count = sum(item.valid_count for item in roi_frames)
+    total_count = sum(item.total_count for item in roi_frames)
+    median = None if len(medians) != len(roi_frames) else float(np.median(medians))
+    temporal_mad = (
+        None
+        if median is None
+        else float(np.median(np.abs(np.asarray(medians) - median)))
+    )
+    local_mad = None if len(mads) != len(roi_frames) else float(np.median(mads))
+    aggregate = RoiStatistics(
+        valid_count=valid_count,
+        total_count=total_count,
+        valid_percentage=(100.0 * valid_count / max(1, total_count)),
+        median_m=median,
+        mad_m=(
+            None
+            if local_mad is None or temporal_mad is None
+            else local_mad + temporal_mad
+        ),
+        error_m=None if median is None else median - known_distance_m,
+    )
+    flattened_zones = [zone for frame in zone_frames for zone in frame]
+    near_values = [zone.supported_unexpected_near_percentage for zone in flattened_zones]
+    limit_values = [zone.near_limit_percentage for zone in flattened_zones]
+    mean_near = float(np.mean(near_values))
+    worst_near = float(np.max(near_values))
+    mean_limit = float(np.mean(limit_values))
+    mean_frame_valid = float(np.mean(frame_valid_percentages))
+    rejection = None
+    if any(item.valid_percentage < 20.0 for item in roi_frames):
+        rejection = "target ROI falls below 20% valid coverage on at least one frame"
+    elif worst_near > MAX_SUPPORTED_NEAR_ZONE_PERCENT:
+        rejection = (
+            f"supported unexpected-near depth reaches {worst_near:.2f}% of a zone "
+            f"(limit {MAX_SUPPORTED_NEAR_ZONE_PERCENT:.2f}%)"
+        )
+    base = automatic_tuning_score(
+        aggregate,
+        mean_frame_valid,
+        float(np.mean(processing_times_ms)),
+        known_distance_m,
+    )
+    score = None
+    if rejection is None and base is not None and temporal_mad is not None:
+        score = float(
+            base
+            + 3.0 * temporal_mad / known_distance_m
+            + 0.08 * mean_near
+            + 0.12 * worst_near
+            + 0.04 * mean_limit
+        )
+    return SafetyTuningEvaluation(
+        score=score,
+        rejection_reason=rejection,
+        aggregate_roi=aggregate,
+        temporal_roi_mad_m=temporal_mad,
+        mean_frame_valid_percentage=mean_frame_valid,
+        mean_supported_near_percentage=mean_near,
+        worst_supported_near_percentage=worst_near,
+        mean_near_limit_percentage=mean_limit,
     )
 
 
@@ -383,10 +590,11 @@ class VpiCudaMatcher:
                 confidence = np.array(data, copy=True)
         except Exception as error:
             raise RuntimeError(f"VPI CUDA stereo failed: {error}") from error
-        plausible = (
-            np.isfinite(disparity)
-            & (disparity > settings.min_disparity)
-            & (disparity < settings.max_disparity)
+        plausible, _near_limit = vpi_disparity_masks(
+            disparity,
+            settings.min_disparity,
+            settings.max_disparity,
+            settings.disparity_safety_margin_px,
         )
         valid = plausible & (confidence >= settings.confidence_threshold)
         return disparity, valid, confidence
