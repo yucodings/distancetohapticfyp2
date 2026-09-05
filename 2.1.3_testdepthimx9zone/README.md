@@ -22,6 +22,9 @@ VPI CUDA computes disparity only once for every stereo pair. All nine median
 distances reuse that one metric-depth map, so this project does not run nine
 stereo matchers or materially increase CUDA memory use. Invalid pixels are
 excluded independently, and an invalid region does not affect another region.
+Before calculating a zone median, the program requires at least 1.6% of that
+zone's pixels to contain valid depth. A zone below 1.6% reports `N/A`,
+preventing a very small collection of noisy pixels from producing a distance.
 
 ## Run
 
