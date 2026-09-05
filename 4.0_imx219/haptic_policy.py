@@ -5,11 +5,12 @@ from typing import Optional
 from config import (
     CLEAR_DEPTH_M,
     FAST_MIN_DEPTH_M,
-    FAST_PERIOD_SECONDS,
+    FAST_OFF_SECONDS,
+    FAST_ON_SECONDS,
     HAPTIC_LEVEL,
-    NORMAL_PULSE_ON_SECONDS,
     SLOW_MIN_DEPTH_M,
-    SLOW_PERIOD_SECONDS,
+    SLOW_OFF_SECONDS,
+    SLOW_ON_SECONDS,
     URGENT_OFF_SECONDS,
     URGENT_ON_SECONDS,
 )
@@ -17,19 +18,19 @@ from data_models import HazardBand, MotorPattern, PATTERN_OFF
 
 
 PATTERN_SLOW = MotorPattern(
-    "slow: 0.20 s every 1.50 s",
+    "slow: 0.50 s on / 1.00 s off",
     HAPTIC_LEVEL,
-    NORMAL_PULSE_ON_SECONDS,
-    SLOW_PERIOD_SECONDS - NORMAL_PULSE_ON_SECONDS,
+    SLOW_ON_SECONDS,
+    SLOW_OFF_SECONDS,
 )
 PATTERN_FAST = MotorPattern(
-    "fast: 0.20 s every 0.80 s",
+    "fast: 0.20 s on / 0.20 s off",
     HAPTIC_LEVEL,
-    NORMAL_PULSE_ON_SECONDS,
-    FAST_PERIOD_SECONDS - NORMAL_PULSE_ON_SECONDS,
+    FAST_ON_SECONDS,
+    FAST_OFF_SECONDS,
 )
 PATTERN_URGENT = MotorPattern(
-    "urgent: 1.00 s on / 0.10 s off",
+    "urgent: 0.10 s on / 0.10 s off",
     HAPTIC_LEVEL,
     URGENT_ON_SECONDS,
     URGENT_OFF_SECONDS,
@@ -54,4 +55,3 @@ def pattern_from_depth(depth_m: Optional[float]) -> MotorPattern:
         HazardBand.FAST: PATTERN_FAST,
         HazardBand.URGENT: PATTERN_URGENT,
     }[band_from_depth(depth_m)]
-

@@ -24,16 +24,16 @@ class HapticPolicyTests(unittest.TestCase):
         self.assertEqual(pattern_from_depth(0.5), PATTERN_FAST)
         self.assertEqual(pattern_from_depth(0.4999), PATTERN_URGENT)
 
-    def test_slow_pattern_is_point_two_seconds_every_one_point_five(self):
-        self.assertAlmostEqual(PATTERN_SLOW.on_time, 0.20)
-        self.assertAlmostEqual(PATTERN_SLOW.off_time, 1.30)
+    def test_slow_pattern_is_point_five_on_one_off(self):
+        self.assertAlmostEqual(PATTERN_SLOW.on_time, 0.50)
+        self.assertAlmostEqual(PATTERN_SLOW.off_time, 1.00)
 
-    def test_fast_pattern_is_point_two_seconds_every_point_eight(self):
+    def test_fast_pattern_is_point_two_on_point_two_off(self):
         self.assertAlmostEqual(PATTERN_FAST.on_time, 0.20)
-        self.assertAlmostEqual(PATTERN_FAST.off_time, 0.60)
+        self.assertAlmostEqual(PATTERN_FAST.off_time, 0.20)
 
-    def test_urgent_pattern_has_short_perception_break(self):
-        self.assertAlmostEqual(PATTERN_URGENT.on_time, 1.00)
+    def test_urgent_pattern_is_point_one_on_point_one_off(self):
+        self.assertAlmostEqual(PATTERN_URGENT.on_time, 0.10)
         self.assertAlmostEqual(PATTERN_URGENT.off_time, 0.10)
 
     def test_all_active_patterns_use_one_fixed_strength(self):
@@ -45,4 +45,3 @@ class HapticPolicyTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
