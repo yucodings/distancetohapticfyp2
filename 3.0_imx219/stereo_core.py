@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Evaluate nine-zone live depth from an IMX219 binocular camera.
+"""Evaluate 18-zone live depth from an IMX219 binocular camera.
 
 The program captures 1280x720 frames from both CSI sensors, rectifies them
 with the selected calibration NPZ, computes full-resolution disparity with
 the matching VPI CUDA Easy Mode profile, calculates metric Z depth from the
-saved Q matrix, and reports median distances in a three-column by three-row
-grid. The nine zones cover the full image width and the middle 80 percent of
+saved Q matrix, and reports median distances in a six-column by three-row
+grid. The 18 zones cover the full image width and the middle 80 percent of
 its height. Full XYZ reconstruction is available as an optional diagnostic
 and PLY export; it uses the same disparity and does not replace or improve
 the stereo matcher.
@@ -73,19 +73,34 @@ EXPECTED_SENSOR_MODE = 4
 MIN_DEPTH_M = 0.20
 MAX_DEPTH_M = 5.00
 MIN_ZONE_DEPTH_SAMPLES = 100
+MIN_ZONE_VALID_PERCENTAGE = 1.6
 ZONE_NAMES = (
-    "Upper Left",
-    "Upper Centre",
-    "Upper Right",
-    "Middle Left",
-    "Middle Centre",
-    "Middle Right",
-    "Lower Left",
-    "Lower Centre",
-    "Lower Right",
+    "Upper 1",
+    "Upper 2",
+    "Upper 3",
+    "Upper 4",
+    "Upper 5",
+    "Upper 6",
+    "Middle 1",
+    "Middle 2",
+    "Middle 3",
+    "Middle 4",
+    "Middle 5",
+    "Middle 6",
+    "Lower 1",
+    "Lower 2",
+    "Lower 3",
+    "Lower 4",
+    "Lower 5",
+    "Lower 6",
+)
+ZONE_ABBREVIATIONS = (
+    "U1", "U2", "U3", "U4", "U5", "U6",
+    "M1", "M2", "M3", "M4", "M5", "M6",
+    "L1", "L2", "L3", "L4", "L5", "L6",
 )
 # Ignore the top/bottom 10% where ceilings, floors and rectification borders
-# commonly create misleading matches. The nine zones cover the complete usable
+# commonly create misleading matches. The 18 zones cover the complete usable
 # area without overlap or gaps.
 ZONE_TOP_FRACTION = 0.10
 ZONE_BOTTOM_FRACTION = 0.90
@@ -97,9 +112,6 @@ ZONE_COLOURS_BGR = (
     (220, 80, 220),
     (0, 220, 220),
     (80, 80, 255),
-    (255, 80, 80),
-    (80, 255, 180),
-    (180, 80, 255),
 )
 
 SGBM_MIN_DISPARITY = 0
@@ -134,7 +146,7 @@ SHOW_DISPARITY_AT_START = False
 SHOW_POINT_CLOUD_AT_START = False
 POINT_CLOUD_STRIDE = 4
 POINT_CLOUD_WINDOW = "IMX219 3D diagnostic: top and front"
-RESULTS_9ZONE_DIR = SCRIPT_DIR / "results_9zone"
+RESULTS_18ZONE_DIR = SCRIPT_DIR / "results_18zone"
 
 
 @dataclass(frozen=True)
@@ -1176,22 +1188,22 @@ def calculate_depth(
     return depth_map, valid_depth_mask
 
 
-def nine_zones(
+def eighteen_zones(
     image_shape: tuple[int, int],
 ) -> tuple[tuple[str, tuple[int, int, int, int]], ...]:
-    """Return a contiguous 3-column by 3-row usable-image grid."""
+    """Return a contiguous 6-column by 3-row usable-image grid."""
     if len(image_shape) != 2:
         raise ValueError("Image shape must contain height and width")
     height, width = image_shape
-    if height < 3 or width < 3:
-        raise ValueError("Image must be at least 3 pixels high and 3 pixels wide")
+    if height < 3 or width < 6:
+        raise ValueError("Image must be at least 3 pixels high and 6 pixels wide")
 
     y1 = min(height - 1, max(0, int(round(height * ZONE_TOP_FRACTION))))
     y2 = min(height, max(y1 + 1, int(round(height * ZONE_BOTTOM_FRACTION))))
     if y2 - y1 < 3:
         y1, y2 = 0, height
     usable_height = y2 - y1
-    x_boundaries = (0, width // 3, (2 * width) // 3, width)
+    x_boundaries = tuple(column * width // 6 for column in range(7))
     y_boundaries = (
         y1,
         y1 + usable_height // 3,
@@ -1200,8 +1212,8 @@ def nine_zones(
     )
     regions = []
     for row in range(3):
-        for column in range(3):
-            index = row * 3 + column
+        for column in range(6):
+            index = row * 6 + column
             regions.append(
                 (
                     ZONE_NAMES[index],
@@ -1220,7 +1232,7 @@ def empty_measurements(image_shape: tuple[int, int]) -> tuple[DepthMeasurement, 
     """Create unavailable measurements before the first depth result arrives."""
     return tuple(
         DepthMeasurement(name, None, box, 0, 0.0)
-        for name, box in nine_zones(image_shape)
+        for name, box in eighteen_zones(image_shape)
     )
 
 
@@ -1247,7 +1259,10 @@ def measure_zone_depth(
     valid_percentage = 100.0 * sample_count / max(1, int(zone_mask.size))
     distance_m = (
         None
-        if sample_count < min_samples
+        if (
+            sample_count < min_samples
+            or valid_percentage < MIN_ZONE_VALID_PERCENTAGE
+        )
         else float(np.median(valid_values))
     )
     return DepthMeasurement(
@@ -1259,12 +1274,12 @@ def measure_zone_depth(
     )
 
 
-def measure_nine_depths(
+def measure_eighteen_depths(
     depth_map: np.ndarray,
     valid_depth_mask: np.ndarray,
     min_samples: int = MIN_ZONE_DEPTH_SAMPLES,
 ) -> tuple[DepthMeasurement, ...]:
-    """Measure all nine grid zones from one shared depth map."""
+    """Measure all 18 grid zones from one shared depth map."""
     return tuple(
         measure_zone_depth(
             name,
@@ -1273,7 +1288,7 @@ def measure_nine_depths(
             valid_depth_mask,
             min_samples,
         )
-        for name, box in nine_zones(depth_map.shape)
+        for name, box in eighteen_zones(depth_map.shape)
     )
 
 
@@ -1338,7 +1353,7 @@ def point_cloud_from_depth_result(result: DepthResult, q_matrix: np.ndarray):
 
 def save_3d_evidence(result: DepthResult, cloud: Any) -> Path:
     stamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S_%f")
-    output = RESULTS_9ZONE_DIR / stamp
+    output = RESULTS_18ZONE_DIR / stamp
     output.mkdir(parents=True, exist_ok=False)
     annotated_left = result.left_rectified.copy()
     annotated_depth = result.depth_view.copy()
@@ -1359,17 +1374,18 @@ def save_3d_evidence(result: DepthResult, cloud: Any) -> Path:
     )
     np.save(output / "valid_mask.npy", result.valid_depth_mask.astype(np.uint8))
     save_binary_ply(output / "point_cloud.ply", cloud)
-    with (output / "nine_zone_measurements.json").open("w", encoding="utf-8") as stream:
+    with (output / "eighteen_zone_measurements.json").open("w", encoding="utf-8") as stream:
         json.dump(
             {
                 "sequence": result.sequence,
                 "layout": {
-                    "type": "nine_zone_grid",
-                    "columns": 3,
+                    "type": "eighteen_zone_grid",
+                    "columns": 6,
                     "rows": 3,
                     "full_width": True,
                     "top_fraction": ZONE_TOP_FRACTION,
                     "bottom_fraction": ZONE_BOTTOM_FRACTION,
+                    "minimum_valid_percentage": MIN_ZONE_VALID_PERCENTAGE,
                 },
                 "measurements": [
                     {
@@ -1540,7 +1556,7 @@ class AsyncDepthProcessor:
                     stereo_engine.minimum_disparity,
                     stereo_engine.maximum_disparity,
                 )
-                measurements = measure_nine_depths(
+                measurements = measure_eighteen_depths(
                     depth_map,
                     valid_depth_mask,
                 )
@@ -1603,7 +1619,7 @@ def draw_measurements(
     image: np.ndarray,
     measurements: tuple[DepthMeasurement, ...],
 ) -> None:
-    """Shade and label the nine independent measurement zones."""
+    """Shade and label the 18 independent measurement zones."""
     overlay = image.copy()
     for index, measurement in enumerate(measurements):
         x1, y1, x2, y2 = measurement.box
@@ -1631,17 +1647,19 @@ def draw_measurements(
             else (0, 0, 255)
         )
         cv2.rectangle(image, (x1, y1), (x2 - 1, y2 - 1), colour, 2)
+        abbreviation = (
+            ZONE_ABBREVIATIONS[index]
+            if index < len(ZONE_ABBREVIATIONS)
+            else measurement.name
+        )
         value = (
-            f"{measurement.distance_m:.2f} m"
+            f"{measurement.distance_m:.2f}m"
             if measurement.distance_m is not None
-            else "Depth N/A"
+            else "N/A"
         )
-        text = (
-            f"{measurement.name}: {value} | "
-            f"valid {measurement.valid_percentage:.1f}%"
-        )
+        text = f"{abbreviation}: {value} | {measurement.valid_percentage:.1f}%"
         text_size, baseline = cv2.getTextSize(
-            text, cv2.FONT_HERSHEY_SIMPLEX, 0.52, 2
+            text, cv2.FONT_HERSHEY_SIMPLEX, 0.40, 1
         )
         label_y = min(y2 - baseline - 4, y1 + text_size[1] + 10)
         label_x = min(max(0, x1), max(0, image.shape[1] - text_size[0] - 8))
@@ -1657,9 +1675,9 @@ def draw_measurements(
             text,
             (label_x, label_y),
             cv2.FONT_HERSHEY_SIMPLEX,
-            0.52,
+            0.40,
             colour,
-            2,
+            1,
             cv2.LINE_AA,
         )
 
@@ -1685,15 +1703,18 @@ def draw_status(
         sync_status = "GOOD"
     else:
         sync_status = "HIGH"
-    abbreviations = ("UL", "UC", "UR", "ML", "MC", "MR", "LL", "LC", "LR")
-    zone_summary = " | ".join(
-        f"{abbreviation}:"
-        + (
-            f"{measurement.distance_m:.2f}m"
-            if measurement.distance_m is not None
-            else "N/A"
+    zone_lines = tuple(
+        "Zones "
+        + " | ".join(
+            f"{ZONE_ABBREVIATIONS[index]}:"
+            + (
+                f"{measurements[index].distance_m:.2f}m"
+                if measurements[index].distance_m is not None
+                else "N/A"
+            )
+            for index in range(row * 6, min((row + 1) * 6, len(measurements)))
         )
-        for abbreviation, measurement in zip(abbreviations, measurements)
+        for row in range(3)
     )
     lines = (
         f"Camera FPS L/R: {left_camera_fps:.1f} / {right_camera_fps:.1f}",
@@ -1702,7 +1723,7 @@ def draw_status(
         f"Display FPS: {display_fps:.1f}",
         f"Depth FPS: {depth_fps:.1f}",
         f"Valid depth: {valid_percentage:.1f}%",
-        f"Zones {zone_summary}",
+    ) + zone_lines + (
         f"Stereo: {backend_name}",
     ) + stereo_diagnostics + (
         "Depth worker: continuous async",
@@ -1719,9 +1740,9 @@ def draw_status(
         cv2.putText(
             image,
             line,
-            (14 + column * column_width, panel_top + 27 + row * 23),
+            (14 + column * column_width, panel_top + 23 + row * 21),
             cv2.FONT_HERSHEY_SIMPLEX,
-            0.50,
+            0.46,
             (255, 255, 255),
             1,
             cv2.LINE_AA,
@@ -1783,7 +1804,7 @@ def print_startup(
     vpi_profile_source: str,
     vpi_safety_margin_px: float,
 ) -> None:
-    print("\nIMX219 nine-zone stereo depth evaluation")
+    print("\nIMX219 18-zone stereo depth evaluation")
     print(f"  OpenCV version:       {cv2.__version__}")
     print(f"  OpenCV path:          {cv2.__file__}")
     print("  GStreamer enabled:    YES")
@@ -1806,8 +1827,8 @@ def print_startup(
     print(f"  Maximum disparity:    {maximum_disparity}")
     if backend_name == OpenCvStereoEngine.name:
         print(f"  Tuned SGBM block:     {sgbm_block_size}")
-    print("  Primary measurement:  nine independent grid-zone Z depths")
-    print("  Zone layout:           3 columns x 3 rows")
+    print("  Primary measurement:  18 independent grid-zone Z depths")
+    print("  Zone layout:           6 columns x 3 rows")
     print("  Zone coverage:         full width, middle 80% height")
     print("  Optional 3D:          calibrated XYZ projection and PLY")
     print("  Rectification maps:   fixed-point CV_16SC2")
@@ -1904,7 +1925,7 @@ def run(args: argparse.Namespace) -> None:
             flush=True,
         )
 
-        window_name = "IMX219 Nine-Zone Stereo Depth Evaluation"
+        window_name = "IMX219 18-Zone Stereo Depth Evaluation"
         cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
         cv2.resizeWindow(
             window_name,

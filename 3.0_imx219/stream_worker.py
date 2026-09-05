@@ -21,7 +21,7 @@ from config import (
 )
 from data_models import MotorPattern, PATTERN_OFF
 from haptic_policy import pattern_from_depth
-from zone_reducer import reduce_nine_to_three
+from zone_reducer import reduce_eighteen_to_three
 
 
 @dataclass(frozen=True)
@@ -259,7 +259,7 @@ class StreamWorker(QObject):
             f"Valid depth: {result.valid_percentage:.1f}%",
             f"Zones {zones}",
             f"Stereo: {self.depth_worker.backend_name}",
-            "Zone backend: 9 medians -> 3 nearest column medians",
+            "Zone backend: 18 medians -> 3 nearest 2-column medians",
         ) + result.diagnostic_lines + self.depth_worker.status_lines() + (
             f"Haptics: {'enabled' if self._haptics_are_enabled else 'disabled'}",
         )
@@ -272,10 +272,10 @@ class StreamWorker(QObject):
         last_depth_received = time.monotonic()
         stale_reported = False
         latest_result: Optional[core.DepthResult] = None
-        nine_measurements = core.empty_measurements(
+        eighteen_measurements = core.empty_measurements(
             (core.EXPECTED_HEIGHT, core.EXPECTED_WIDTH)
         )
-        measurements = reduce_nine_to_three(nine_measurements)
+        measurements = reduce_eighteen_to_three(eighteen_measurements)
 
         try:
             self.camera_status.emit("Starting")
@@ -342,8 +342,10 @@ class StreamWorker(QObject):
                     last_depth_sequence = result.sequence
                     last_depth_received = time.monotonic()
                     stale_reported = False
-                    nine_measurements = result.measurements
-                    measurements = reduce_nine_to_three(nine_measurements)
+                    eighteen_measurements = result.measurements
+                    measurements = reduce_eighteen_to_three(
+                        eighteen_measurements
+                    )
                     self._apply_haptics(measurements, "fresh zone value")
                     self.zones_ready.emit(measurements)
                     self.depth_ready.emit(
@@ -365,10 +367,12 @@ class StreamWorker(QObject):
                     > DEPTH_RESULT_MAX_AGE_SECONDS
                     and not stale_reported
                 ):
-                    nine_measurements = core.empty_measurements(
+                    eighteen_measurements = core.empty_measurements(
                         (calibration.height, calibration.width)
                     )
-                    measurements = reduce_nine_to_three(nine_measurements)
+                    measurements = reduce_eighteen_to_three(
+                        eighteen_measurements
+                    )
                     self._apply_haptics(measurements, "stale-depth safety stop")
                     self.zones_ready.emit(measurements)
                     self.log_ready.emit("Depth result stale; all zone values invalid")
