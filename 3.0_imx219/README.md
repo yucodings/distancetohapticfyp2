@@ -1,13 +1,26 @@
 # Low-Cost Binocular Camera Distance-to-Haptic Navigation System
 
-This PySide6 application combines the tested `2.1.1.1` IMX219 three-zone
-stereo visualization with three DA7280 haptic outputs behind a TCA9548A.
+This PySide6 application combines a six-zone IMX219 depth backend with the
+tested three-column visualization and three DA7280 haptic outputs behind a
+TCA9548A.
 
-The stereo core is intentionally unchanged in purpose: synchronized capture,
-rectification, VPI CUDA disparity, metric depth, and median distances for the
-expanded left, centre, and right zones. No YOLO, object detection, point-cloud
-processing, depth fusion, nearest-point search, or extra zone filtering feeds
-the haptic decision.
+The stereo core performs synchronized capture, rectification, one VPI CUDA
+disparity calculation, metric depth, and six median measurements arranged as
+three columns by two rows. A small reducer selects the nearest valid upper or
+lower median in each column. Only the resulting Left, Centre, and Right values
+reach the UI and haptic policy. No YOLO, object detection, point-cloud
+processing, depth fusion, nearest-pixel search, or extra filtering feeds the
+haptic decision.
+
+```text
+Upper Left    Upper Centre    Upper Right
+     |              |              |
+Lower Left    Lower Centre    Lower Right
+     |              |              |
+     +---- nearest valid median ----+
+                    |
+          Left / Centre / Right
+```
 
 ## Haptic policy
 
@@ -58,4 +71,3 @@ Always validate Left, Centre, and Right orientation before pressing
 ```
 
 The tests use mock I2C transports and never activate real motors.
-
