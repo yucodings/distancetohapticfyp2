@@ -3,7 +3,7 @@
   "calibration_sha256": "7fbc6fe5dbd7f837e8312249a95bcd03353126531d6189dce301073add7534ad",
   "known_distance_m": 1.0,
   "schema_version": 2,
-  "score": 0.330895180773114,
+  "score": 0.20197010927382283,
   "settings": {
     "confidence_threshold": 32767,
     "disparity_safety_margin_px": 8.0,
