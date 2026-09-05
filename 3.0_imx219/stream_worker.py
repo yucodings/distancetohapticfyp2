@@ -21,7 +21,7 @@ from config import (
 )
 from data_models import MotorPattern, PATTERN_OFF
 from haptic_policy import pattern_from_depth
-from zone_reducer import reduce_six_to_three
+from zone_reducer import reduce_nine_to_three
 
 
 @dataclass(frozen=True)
@@ -209,12 +209,21 @@ class StreamWorker(QObject):
             (core.DISPLAY_PANEL_WIDTH, core.DISPLAY_PANEL_HEIGHT),
             interpolation=core.cv2.INTER_AREA,
         )
+        footer_overlay = preview.copy()
         core.cv2.rectangle(
-            preview,
+            footer_overlay,
             (0, core.DISPLAY_PANEL_HEIGHT - 34),
             (core.DISPLAY_PANEL_WIDTH, core.DISPLAY_PANEL_HEIGHT),
             (0, 0, 0),
             -1,
+        )
+        core.cv2.addWeighted(
+            footer_overlay,
+            0.30,
+            preview,
+            0.70,
+            0.0,
+            preview,
         )
         core.cv2.putText(
             preview,
@@ -250,7 +259,7 @@ class StreamWorker(QObject):
             f"Valid depth: {result.valid_percentage:.1f}%",
             f"Zones {zones}",
             f"Stereo: {self.depth_worker.backend_name}",
-            "Zone backend: 6 medians -> 3 nearest column medians",
+            "Zone backend: 9 medians -> 3 nearest column medians",
         ) + result.diagnostic_lines + self.depth_worker.status_lines() + (
             f"Haptics: {'enabled' if self._haptics_are_enabled else 'disabled'}",
         )
@@ -263,10 +272,10 @@ class StreamWorker(QObject):
         last_depth_received = time.monotonic()
         stale_reported = False
         latest_result: Optional[core.DepthResult] = None
-        six_measurements = core.empty_measurements(
+        nine_measurements = core.empty_measurements(
             (core.EXPECTED_HEIGHT, core.EXPECTED_WIDTH)
         )
-        measurements = reduce_six_to_three(six_measurements)
+        measurements = reduce_nine_to_three(nine_measurements)
 
         try:
             self.camera_status.emit("Starting")
@@ -333,8 +342,8 @@ class StreamWorker(QObject):
                     last_depth_sequence = result.sequence
                     last_depth_received = time.monotonic()
                     stale_reported = False
-                    six_measurements = result.measurements
-                    measurements = reduce_six_to_three(six_measurements)
+                    nine_measurements = result.measurements
+                    measurements = reduce_nine_to_three(nine_measurements)
                     self._apply_haptics(measurements, "fresh zone value")
                     self.zones_ready.emit(measurements)
                     self.depth_ready.emit(
@@ -356,10 +365,10 @@ class StreamWorker(QObject):
                     > DEPTH_RESULT_MAX_AGE_SECONDS
                     and not stale_reported
                 ):
-                    six_measurements = core.empty_measurements(
+                    nine_measurements = core.empty_measurements(
                         (calibration.height, calibration.width)
                     )
-                    measurements = reduce_six_to_three(six_measurements)
+                    measurements = reduce_nine_to_three(nine_measurements)
                     self._apply_haptics(measurements, "stale-depth safety stop")
                     self.zones_ready.emit(measurements)
                     self.log_ready.emit("Depth result stale; all zone values invalid")

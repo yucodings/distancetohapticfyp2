@@ -1,19 +1,21 @@
 # Low-Cost Binocular Camera Distance-to-Haptic Navigation System
 
-This PySide6 application combines a six-zone IMX219 depth backend with the
+This PySide6 application combines a nine-zone IMX219 depth backend with the
 tested three-column visualization and three DA7280 haptic outputs behind a
 TCA9548A.
 
 The stereo core performs synchronized capture, rectification, one VPI CUDA
-disparity calculation, metric depth, and six median measurements arranged as
-three columns by two rows. A small reducer selects the nearest valid upper or
-lower median in each column. Only the resulting Left, Centre, and Right values
+disparity calculation, metric depth, and nine median measurements arranged as
+three columns by three rows. A small reducer selects the nearest valid upper,
+middle, or lower median in each column. Only the resulting Left, Centre, and Right values
 reach the UI and haptic policy. No YOLO, object detection, point-cloud
 processing, depth fusion, nearest-pixel search, or extra filtering feeds the
 haptic decision.
 
 ```text
 Upper Left    Upper Centre    Upper Right
+     |              |              |
+Middle Left   Middle Centre   Middle Right
      |              |              |
 Lower Left    Lower Centre    Lower Right
      |              |              |
@@ -44,7 +46,8 @@ depth, worker errors, and application shutdown request all motors off.
 The responsive window follows a 65/35 left/right split. The left camera panel
 uses about 77% of its column with three equal metre-only cards below it. The
 right column contains equal-height depth heatmap, diagnostics, and log panels.
-The camera and heatmap retain the 2.1.1.1 zone shading and labels.
+The camera and heatmap retain the three-column 2.1.1.1 shading and labels;
+the nine backend regions are not drawn in the normal 3.0 UI.
 
 ## Run
 
