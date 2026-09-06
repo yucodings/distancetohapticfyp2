@@ -55,7 +55,7 @@ from pointcloud_utils import (
 # User-adjustable settings
 # ---------------------------------------------------------------------------
 SCRIPT_DIR = Path(__file__).resolve().parent
-SOURCE_PROJECT_DIR = SCRIPT_DIR.parent / "2.1_testdepthimx219"
+SOURCE_PROJECT_DIR = SCRIPT_DIR.parent / "2.0_testdepthimx219"
 DEFAULT_CALIBRATION_PATH = SOURCE_PROJECT_DIR / "stereo_calibration.npz"
 DEFAULT_VPI_PROFILE_PATH = SOURCE_PROJECT_DIR / "vpi_tuned_profile.json"
 

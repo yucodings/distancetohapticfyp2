@@ -22,7 +22,7 @@ printf '%s\n' \
   "2. Clear all closer objects from the LEFT, CENTER, and RIGHT thirds." \
   "3. Keep the target and cameras still." \
   "4. When the windows appear, press A once; five live pairs are tested." \
-  "5. The best safety-checked profile is applied automatically to 3.0." \
+  "5. The best profile is saved for the 2.x, 4.0, and 7.0 launchers." \
   "6. Press Q when finished." \
   "Calibration: $CALIBRATION"
 

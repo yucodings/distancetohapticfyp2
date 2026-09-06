@@ -1,6 +1,6 @@
 # IMX219 18-zone depth evaluation
 
-This project extends `2.1.3_testdepthimx9zone` into 18 independent regions
+This project extends `2.4_testdepthimx9zone` into 18 independent regions
 while leaving the nine-zone project unchanged.
 
 ```text
@@ -28,7 +28,7 @@ calculating a median.
 ## Run
 
 ```bash
-cd /home/orin_nano/Desktop/FYP2/2.3_testdepthimx18zone
+cd /home/orin_nano/Desktop/FYP2/2.5_testdepthimx18zone
 ./run_with_latest_calibration.sh
 ```
 

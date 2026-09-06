@@ -19,7 +19,7 @@ DEPTH_RESULT_MAX_AGE_SECONDS = 1.0
 
 # Optional YOLO11n TensorRT detection. Detection is deliberately slower than
 # camera capture and uses a one-frame mailbox so it can never build latency.
-DETECTOR_MODEL_PATH = PROJECT_ROOT / "models" / "best.engine"
+DETECTOR_MODEL_PATH = PROJECT_ROOT / "models" / "best_indoor_v2.engine"
 DETECTION_ENABLED = True
 DETECTION_FPS = 2.0
 DETECTION_INPUT_SIZE = 640

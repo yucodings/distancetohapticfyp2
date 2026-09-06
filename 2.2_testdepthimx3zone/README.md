@@ -1,6 +1,6 @@
 # IMX219 expanded three-zone depth test
 
-This project extends `2.1.1_testdepthimx3frame` without changing the original
+This project extends `2.1_testdepthimx3frame` without changing the original
 folder. It divides every completed metric-depth map into three contiguous
 vertical measurement zones:
 
@@ -24,12 +24,13 @@ the measurement regions does not triple CUDA work or memory use.
 ## Run
 
 ```bash
-cd /home/orin_nano/Desktop/FYP2/2.1.1.1_testdepthimx3zone
+cd /home/orin_nano/Desktop/FYP2/2.2_testdepthimx3zone
 ./run_with_latest_calibration.sh
 ```
 
 The launcher selects the newest calibration under `../1.0_calibration/images/`
-and uses the VPI profile expected by the restored 2.1.1 pipeline.
+and uses the matching schema-2 VPI profile under
+`../1.1_depth_visualization/results/`.
 
 ## Controls
 

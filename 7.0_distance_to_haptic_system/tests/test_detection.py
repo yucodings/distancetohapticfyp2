@@ -12,6 +12,7 @@ if str(PROJECT_DIR) not in sys.path:
     sys.path.insert(0, str(PROJECT_DIR))
 
 from data_models import Detection
+from config import DETECTOR_MODEL_PATH
 from detection_overlay import draw_detections
 from detection_worker import LatestFrameDetectionWorker
 from gpu_scheduler import GpuScheduler
@@ -25,7 +26,7 @@ from tensorrt_detector import (
 
 class EngineMetadataTests(unittest.TestCase):
     def test_deployment_engine_is_the_expected_static_fp16_model(self):
-        metadata = read_engine_metadata(PROJECT_DIR / "models" / "best.engine")
+        metadata = read_engine_metadata(DETECTOR_MODEL_PATH)
 
         self.assertEqual(metadata.task, "detect")
         self.assertEqual(metadata.batch, 1)
@@ -120,7 +121,7 @@ class _FakeDetector:
 class DetectionWorkerTests(unittest.TestCase):
     def test_worker_keeps_latest_result_without_haptic_data(self):
         worker = LatestFrameDetectionWorker(
-            PROJECT_DIR / "models" / "best.engine",
+            DETECTOR_MODEL_PATH,
             GpuScheduler(),
             detection_fps=100.0,
             confidence=0.45,

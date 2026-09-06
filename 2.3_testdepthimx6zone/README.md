@@ -1,6 +1,6 @@
 # IMX219 six-zone depth evaluation
 
-This project extends `2.1.1.1_testdepthimx3zone` into six independent
+This project extends `2.2_testdepthimx3zone` into six independent
 measurement regions while leaving the source project unchanged.
 
 ```text
@@ -24,12 +24,13 @@ independently, and one zone becoming unavailable does not invalidate another.
 ## Run
 
 ```bash
-cd /home/orin_nano/Desktop/FYP2/2.1.2_testdepthimx6zone
+cd /home/orin_nano/Desktop/FYP2/2.3_testdepthimx6zone
 ./run_with_latest_calibration.sh
 ```
 
 The launcher selects the newest completed calibration under
-`../1.0_calibration/images/` and the VPI profile used by the restored pipeline.
+`../1.0_calibration/images/` and the matching schema-2 VPI profile under
+`../1.1_depth_visualization/results/`.
 
 ## Controls
 

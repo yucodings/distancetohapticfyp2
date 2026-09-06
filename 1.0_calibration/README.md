@@ -60,8 +60,8 @@ python3 recalibrate_existing.py \
 
 The original raw images and original NPZ are not overwritten. A new
 `*_recalibrated` session is created with its own filtered NPZ, report,
-rectified evidence and quality-rejection images. The `1.1` and `2.1` latest
-calibration launchers will then select that new NPZ automatically.
+rectified evidence and quality-rejection images. The `1.1`, `2.x`, `4.0`, and
+`7.0` latest-calibration launchers then select that new NPZ automatically.
 
 Run non-camera tests with:
 

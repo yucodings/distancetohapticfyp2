@@ -1,7 +1,7 @@
 # RealSense three-zone depth test
 
-This project extends `2.2_testdepthrealsensed435i` with three independent
-measurement boxes matching the layout of the IMX219 `2.1.1` test.
+This project extends `3.0_testdepthrealsensed435i` with three independent
+measurement boxes matching the layout of the IMX219 `2.1` test.
 
 - Left: centred at one sixth of the image width
 - Centre: centred at one half of the image width
@@ -15,7 +15,7 @@ independent medians from that shared depth map.
 ## Run
 
 ```bash
-cd /home/orin_nano/Desktop/FYP2/2.2.1_testdepthrealsense3frame
+cd /home/orin_nano/Desktop/FYP2/3.1_testdepthrealsense3frame
 ./run_with_sudo.sh
 ```
 
@@ -52,4 +52,3 @@ The tests do not require a connected RealSense camera:
 ```bash
 PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -v
 ```
-

@@ -11,7 +11,7 @@ visualization profile by default:
 Run it from the project folder:
 
 ```bash
-cd /home/orin_nano/Desktop/FYP2/2.1_testdepthimx219
+cd /home/orin_nano/Desktop/FYP2/2.0_testdepthimx219
 ./run_with_latest_calibration.sh
 ```
 
@@ -41,7 +41,7 @@ stereo depth by itself; it makes geometry and bad matches easier to inspect.
 
 The default VPI path uses the exact matching Easy Mode profile. This folder is
 diagnostic only; the current result still contains sparse false-near surfaces,
-so it must not be treated as approval to enable the `3.0` actuators.
+so it must not be treated as approval to enable the `4.0` or `7.0` actuators.
 
 Run offline checks with:
 

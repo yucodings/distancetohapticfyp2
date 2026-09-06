@@ -51,14 +51,18 @@ from pointcloud_utils import (
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-DEFAULT_CALIBRATION = SCRIPT_DIR.parent / "3.0_imx219" / "stereo_calibration.npz"
+DEFAULT_CALIBRATION = (
+    SCRIPT_DIR.parent / "2.0_testdepthimx219" / "stereo_calibration.npz"
+)
 RESULTS_DIR = SCRIPT_DIR / "results"
 CONTROL_WINDOW = "Stereo tuner controls"
 DASHBOARD_WINDOW = "IMX219 stereo depth tuner"
 ALIGNMENT_WINDOW = "Rectification check: LEFT green | RIGHT red"
 AUTO_WINDOW = "Easy Mode automatic tuning"
 POINT_CLOUD_WINDOW = "3D diagnostic: top and front projections"
-PRODUCTION_VPI_PROFILE = SCRIPT_DIR.parent / "3.0_imx219" / "vpi_tuned_profile.json"
+# The supported consumers read RESULTS_DIR/vpi_recommended_profile.json.
+# Do not write a second deployment copy; supported consumers read RESULTS_DIR.
+PRODUCTION_VPI_PROFILE = None
 VPI_EASY_FRAME_COUNT = 5
 
 

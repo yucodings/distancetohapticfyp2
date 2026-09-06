@@ -1,6 +1,6 @@
 # IMX219 three-zone depth test
 
-This project keeps the calibrated stereo pipeline from `2.1_testdepthimx219`
+This project keeps the calibrated stereo pipeline from `2.0_testdepthimx219`
 and measures three independent regions from each completed depth map:
 
 - **Left** at one sixth of the image width
@@ -16,7 +16,7 @@ pixels; the other zones continue independently.
 ## Run
 
 ```bash
-cd /home/orin_nano/Desktop/FYP2/2.1.1_testdepthin3frame
+cd /home/orin_nano/Desktop/FYP2/2.1_testdepthimx3frame
 ./run_with_latest_calibration.sh
 ```
 
@@ -25,8 +25,8 @@ and the schema-2 profile at
 `../1.1_depth_visualization/results/vpi_recommended_profile.json`. Startup
 stops if the calibration hash in the profile does not match.
 
-Direct execution uses the calibration and profile copied into the original
-`2.1_testdepthimx219` project by default:
+For normal use, run the launcher above so the newest calibration and matching
+profile are passed explicitly. Direct execution is available for debugging:
 
 ```bash
 python3 test_depth_imx219_3frame.py
