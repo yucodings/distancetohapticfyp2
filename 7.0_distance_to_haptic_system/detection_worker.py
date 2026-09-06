@@ -108,6 +108,10 @@ class LatestFrameDetectionWorker:
         with self._condition:
             return self._latest
 
+    def has_failed(self) -> bool:
+        with self._condition:
+            return self._error is not None
+
     def status_lines(self) -> tuple[str, ...]:
         with self._condition:
             latest = self._latest

@@ -29,6 +29,9 @@ Rectified left frame ---- YOLO11n TensorRT ---- UI boxes only
 - UI output: nearest valid median from six cells in each display column.
 - Detector: `models/best_indoor_v2.engine`, 640x640, static batch 1, FP16.
 - Detector rate: 2 FPS, with a one-frame newest-only mailbox.
+- UI stability: confidence 0.40, same-class IoU matching, smoothed boxes, and
+  persistence for two missed results; the third miss or 1.5-second age limit
+  removes a box.
 - Scheduling: depth has priority; detection drops work while CUDA is busy.
 - Safety: stale/failed depth switches haptics off; detection failure only
   removes detection overlays.

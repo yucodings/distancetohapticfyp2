@@ -15,12 +15,15 @@ from PySide6.QtGui import QImage
 import stereo_core as core
 from actuators import ActuatorManager
 from config import (
+    DETECTION_BOX_HOLD_SECONDS,
+    DETECTION_BOX_MATCH_IOU,
+    DETECTION_BOX_MAX_MISSES,
+    DETECTION_BOX_SMOOTHING_ALPHA,
     DETECTION_CONFIDENCE,
     DETECTION_ENABLED,
     DETECTION_FPS,
     DETECTION_IOU,
     DETECTION_MAX_RESULTS,
-    DETECTION_RESULT_MAX_AGE_SECONDS,
     DETECTOR_MODEL_PATH,
     DEPTH_RESULT_MAX_AGE_SECONDS,
     DISPLAY_LABELS,
@@ -28,6 +31,7 @@ from config import (
 )
 from data_models import Detection, DetectionScene, MotorPattern, PATTERN_OFF
 from detection_overlay import draw_detections
+from detection_stabilizer import DetectionStabilizer
 from detection_worker import LatestFrameDetectionWorker
 from gpu_scheduler import GpuScheduler
 from haptic_policy import pattern_from_depth
@@ -80,6 +84,12 @@ class StreamWorker(QObject):
         self.capture: Optional[core.SynchronizedStereoCapture] = None
         self.depth_worker: Optional[core.AsyncDepthProcessor] = None
         self.detection_worker: Optional[LatestFrameDetectionWorker] = None
+        self.detection_stabilizer = DetectionStabilizer(
+            max_misses=DETECTION_BOX_MAX_MISSES,
+            hold_seconds=DETECTION_BOX_HOLD_SECONDS,
+            match_iou=DETECTION_BOX_MATCH_IOU,
+            smoothing_alpha=DETECTION_BOX_SMOOTHING_ALPHA,
+        )
         self.gpu_scheduler = GpuScheduler()
         self.left_camera = None
         self.right_camera = None
@@ -412,6 +422,14 @@ class StreamWorker(QObject):
                         )
                     ):
                         latest_detection = detector_result
+                        self.detection_stabilizer.update(
+                            detector_result.detections,
+                            detector_result.completed_at,
+                        )
+
+                    if self.detection_worker.has_failed():
+                        latest_detection = None
+                        self.detection_stabilizer.reset()
 
                 result = self.depth_worker.latest_result()
                 if result is not None and result.sequence > last_depth_sequence:
@@ -455,13 +473,9 @@ class StreamWorker(QObject):
                     self.log_ready.emit("Depth result stale; all zone values invalid")
                     stale_reported = True
 
-                visible_detections: tuple[Detection, ...] = ()
-                if (
-                    latest_detection is not None
-                    and time.monotonic() - latest_detection.completed_at
-                    <= DETECTION_RESULT_MAX_AGE_SECONDS
-                ):
-                    visible_detections = latest_detection.detections
+                visible_detections = self.detection_stabilizer.visible(
+                    time.monotonic()
+                )
 
                 self.camera_ready.emit(
                     self._to_qimage(
